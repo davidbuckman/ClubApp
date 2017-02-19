@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ScaleAnimation shrinkAnim;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
-    private TextView tvNoMovies;
+    private TextView clubView;
 
 
     //Getting reference to Firebase Database
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Initializing our Recyclerview
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        tvNoMovies = (TextView) findViewById(R.id.tv_no_movies);
+        clubView = (TextView) findViewById(R.id.club_view);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(Html.fromHtml("<font color='#ffffff'>Club List </font>"));
@@ -95,12 +95,6 @@ public class MainActivity extends AppCompatActivity {
                      }
                  });
 
-//                if(tvNoMovies.getVisibility()== View.VISIBLE){
-//                    tvNoMovies.setVisibility(View.GONE);
-//                }
-//                viewHolder.clubName.setText(model.getName());
-//                viewHolder.ratingBar.setRating(5);
-//                Picasso.with(MainActivity.this).load(model.getAboutText()).into(viewHolder.ivMoviePoster);
             }
         };
 
@@ -110,11 +104,6 @@ public class MainActivity extends AppCompatActivity {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.frame_container, new AddMovieFragment())
-//                        .addToBackStack(null)
-//                        .commit();
-                //animation being used to make floating actionbar disappear
                 shrinkAnim.setDuration(400);
                 fab.setAnimation(shrinkAnim);
                 shrinkAnim.start();
