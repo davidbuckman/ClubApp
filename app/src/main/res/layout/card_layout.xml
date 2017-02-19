@@ -1,72 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/card_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    card_view:cardCornerRadius="4dp"
-    android:layout_margin="5dp">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <!-- A CardView that contains a TextView -->
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        card_view:cardElevation="5dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardBackgroundColor="#FFFFFF">
 
-        <TextView
-            android:id="@+id/title"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:background="@color/bkg_card"
-            android:text="contact det"
-            android:gravity="center_vertical"
-            android:textColor="@android:color/white"
-            android:textSize="14dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txtName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Name"
-            android:gravity="center_vertical"
-            android:textSize="10dp"
-            android:layout_below="@id/title"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"/>
+            <TextView
+                android:id="@+id/club_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="left"
+                android:paddingLeft="20dp"
+                android:textSize="36sp"
+                android:textStyle="normal"
+                android:text="Club Name"
+                android:layout_gravity="start"
+                android:textAlignment="viewStart"
+                android:paddingTop="20dp" />
 
-        <TextView
-            android:id="@+id/txtSurname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Surname"
-            android:gravity="center_vertical"
-            android:textSize="10dp"
-            android:layout_below="@id/txtName"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"
-            />
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/club_description"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:textSize="18sp"
+                android:paddingBottom="20dp" />
 
-        <TextView
-            android:id="@+id/txtEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Email"
-            android:textSize="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="150dp"
-            android:layout_alignBaseline="@id/txtName"/>
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_alignParentBottom="true">
+                <Button
+                    android:id="@+id/club_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="Go To Club Page"
+                    android:layout_gravity="start"
+                    android:textAlignment="textStart"
+                    android:background="#FFFFFF"
+                    android:textStyle="normal|bold"
+                    android:paddingLeft="20dp"
+                    android:textColor="#F79E21">
+                </Button>
 
-        <TextView
-            android:id="@+id/txtAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Address"
-            android:textSize="10dp"
-            android:layout_alignStart="@id/txtEmail"
-            android:layout_alignLeft="@id/txtEmail"
-            android:layout_alignBaseline="@id/txtSurname"/>
+                <TextView
+                    android:id="@+id/point"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="18dp"
+                    android:background="@color/tw__composer_red"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:layout_marginRight="20dp"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/white"
+                    android:text="Unread Notifications" />
+            </LinearLayout>
 
-    </RelativeLayout>
+        </LinearLayout>
 
 
-</android.support.v7.widget.CardView>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
