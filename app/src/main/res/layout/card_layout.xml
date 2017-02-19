@@ -27,12 +27,13 @@
                 android:layout_height="match_parent"
                 android:gravity="left"
                 android:paddingLeft="20dp"
-                android:textSize="36sp"
+                android:textSize="30sp"
                 android:textStyle="normal"
                 android:text="Club Name"
                 android:layout_gravity="start"
                 android:textAlignment="viewStart"
-                android:paddingTop="20dp" />
+                android:paddingTop="20dp"
+                android:textColor="#000000" />
 
             <TextView
                 android:text="TextView"
@@ -42,7 +43,8 @@
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:textSize="18sp"
-                android:paddingBottom="20dp" />
+                android:paddingBottom="20dp"
+                android:textColor="#000000" />
 
             <LinearLayout
                 android:id="@+id/LinearLayout02"
@@ -57,24 +59,11 @@
                     android:layout_gravity="start"
                     android:textAlignment="textStart"
                     android:background="#FFFFFF"
-                    android:textStyle="normal|bold"
                     android:paddingLeft="20dp"
-                    android:textColor="#F79E21">
+                    android:textColor="#F79E21"
+                    android:textStyle="normal|bold">
                 </Button>
 
-                <TextView
-                    android:id="@+id/point"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="18dp"
-                    android:background="@color/tw__composer_red"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:layout_marginRight="20dp"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/white"
-                    android:text="Unread Notifications" />
             </LinearLayout>
 
         </LinearLayout>
