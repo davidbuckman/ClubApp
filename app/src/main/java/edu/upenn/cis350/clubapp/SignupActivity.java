@@ -109,7 +109,6 @@ public class SignupActivity extends AppCompatActivity {
                                 } else {
                                     FirebaseUser fbUser = auth.getCurrentUser();
                                     User user = new User(firstName, lastName, fbUser.getEmail());
-                                    user.addClub("hack4impact");
                                     db.getReference("users").child(fbUser.getUid()).setValue(user);
                                     startActivity(new Intent(SignupActivity.this, MainActivity.class));
                                     finish();
