@@ -169,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //ViewHolder for our Firebase UI
-    //updated to be non-staic
     public static class ClubViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView clubName;
         TextView clubAbout;

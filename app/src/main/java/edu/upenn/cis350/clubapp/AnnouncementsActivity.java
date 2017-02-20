@@ -75,10 +75,7 @@ public class AnnouncementsActivity extends AppCompatActivity {
             startActivity(i);
         }
 
-        //get database ref
-//        DatabaseReference tempRef = mDatabaseReference;
-
-        //set up for display
+         //set up for display
         mRecyclerView = (RecyclerView) findViewById(R.id.notification_recycler_view);
 
         if (mRecyclerView != null) {
@@ -91,6 +88,7 @@ public class AnnouncementsActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
+        //get data and display
         DatabaseReference ref = mDatabaseReference;
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
