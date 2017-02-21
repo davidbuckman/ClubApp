@@ -1,6 +1,7 @@
 package edu.upenn.cis350.clubapp;
 
 import android.content.Context;
+
 import android.content.Intent;
 import android.graphics.Movie;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
+
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;

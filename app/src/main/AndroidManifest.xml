@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,11 +29,6 @@
         <activity
             android:name=".CreateAccountActivity"
             android:label="CreateAccount">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
@@ -50,8 +46,6 @@
             android:name=".SettingsActivity"
             android:label="SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
-
         <activity android:name=".AnnouncementsActivity"></activity>
 
     </application>
