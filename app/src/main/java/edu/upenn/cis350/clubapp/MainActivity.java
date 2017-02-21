@@ -1,5 +1,7 @@
 package edu.upenn.cis350.clubapp;
 
+import android.content.Context;
+
 import android.content.Intent;
 import android.graphics.Movie;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.widget.Button;
+
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -28,6 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static Context mContext;
 
     private FloatingActionButton fab;
 
@@ -48,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mContext = this;
 
 
         //Initializing our Recyclerview
@@ -79,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         ) {
             @Override
             protected void populateViewHolder(final ClubViewHolder viewHolder, final Boolean model, int position) {
-                String key = this.getRef(position).getKey();
+                final String key = this.getRef(position).getKey();
                 mDatabaseReference.child("clubs").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                      @Override
                      public void onDataChange(DataSnapshot dataSnapshot) {
@@ -87,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                          String about = dataSnapshot.child("about").getValue(String.class);
                          viewHolder.clubName.setText(name);
                          viewHolder.clubAbout.setText(about);
+                         viewHolder.clubLink.setTag(R.string.club_id, key);
                      }
 
                      @Override
@@ -162,15 +171,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //ViewHolder for our Firebase UI
-    public static class ClubViewHolder extends RecyclerView.ViewHolder{
-
+    public static class ClubViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView clubName;
         TextView clubAbout;
+        Button clubLink;
 
         public ClubViewHolder(View v) {
             super(v);
             clubName = (TextView) v.findViewById(R.id.club_name);
             clubAbout = (TextView) v.findViewById(R.id.club_description);
+            clubLink = (Button) v.findViewById(R.id.club_link);
+
+
+            clubLink.setOnClickListener(this);
+
         }
+
+        @Override
+        public void onClick(View v){
+            System.out.println("Click" + clubName.getText().toString());
+            Intent i = new Intent(mContext, AnnouncementsActivity.class);
+            i.putExtra("CLUB", clubLink.getTag(R.string.club_id).toString());
+            mContext.startActivity(i);
+
+        }
+
     }
+
 }
