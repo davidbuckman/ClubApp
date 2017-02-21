@@ -10,13 +10,12 @@ public class ClubNotification {
     String author, channel, content;
     long timeStamp;
 
-
     public ClubNotification() {
 
     }
 
-    public ClubNotification(String author, String channel, String content, long timeStamp) {
 
+    public ClubNotification(String author, String channel, String content, long timeStamp) {
         this.author = author;
         this.channel = channel;
         this.content = content;
@@ -46,6 +45,7 @@ public class ClubNotification {
     public void setContent(String content) {
         this.content = content;
     }
+
 
     public long getTimeStamp() {
         return timeStamp;
