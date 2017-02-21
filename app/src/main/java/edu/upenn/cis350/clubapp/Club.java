@@ -8,7 +8,7 @@ import java.util.HashMap;
  */
 
 public class Club {
-    String name, aboutText;
+    String name, about;
     HashMap<String, Boolean> channels = new HashMap<String, Boolean>();
     HashMap<String, Boolean> notifications = new HashMap<String, Boolean>();
     HashMap<String, Boolean> events = new HashMap<String, Boolean>();
@@ -18,7 +18,7 @@ public class Club {
 
     public Club(String name, String aboutText, String creatorUid) {
         this.name = name;
-        this.aboutText = aboutText;
+        this.about = aboutText;
         this.members.put(creatorUid, new ClubMember(false, "Creator"));
     }
 
@@ -31,11 +31,11 @@ public class Club {
     }
 
     public String getAboutText() {
-        return aboutText;
+        return about;
     }
 
     public void setAboutText(String aboutText) {
-        this.aboutText = aboutText;
+        this.about = aboutText;
     }
 
     public HashMap<String, Boolean> getChannels() {
