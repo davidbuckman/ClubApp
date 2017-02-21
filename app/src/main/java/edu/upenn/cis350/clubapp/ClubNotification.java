@@ -8,13 +8,14 @@ import java.util.Date;
 
 public class ClubNotification {
     String author, channel, content;
-    Date timeStamp;
+    long timeStamp;
 
     public ClubNotification() {
 
     }
 
-    public ClubNotification(String author, String channel, String content, Date timeStamp) {
+
+    public ClubNotification(String author, String channel, String content, long timeStamp) {
         this.author = author;
         this.channel = channel;
         this.content = content;
@@ -45,11 +46,12 @@ public class ClubNotification {
         this.content = content;
     }
 
-    public Date getTimeStamp() {
+
+    public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Date timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 }
