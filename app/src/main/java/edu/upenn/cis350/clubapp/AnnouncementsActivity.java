@@ -147,19 +147,12 @@ public class AnnouncementsActivity extends AppCompatActivity {
                 RVAdapter adapter = new RVAdapter(messages);
                 mRecyclerView.setAdapter(adapter);
 
-    }
+            }
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-});
-
-
-
-
-
-
-
+        });
 
     }
 
