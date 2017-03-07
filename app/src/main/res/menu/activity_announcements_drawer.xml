@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_information"
+            android:icon="@drawable/ic_menu_information"
+            android:title="Information" />
+        <item
+            android:id="@+id/nav_announcements"
+            android:icon="@drawable/ic_menu_announcements"
+            android:title="Announcements" />
+        <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/ic_menu_calendar"
+            android:title="Calendar" />
+        <item
+            android:id="@+id/nav_directory"
+            android:icon="@drawable/ic_menu_directory"
+            android:title="Directory" />
+        <item
+            android:id="@+id/nav_club_settings"
+            android:icon="@drawable/ic_menu_settings"
+            android:title="Club Settings" />
+    </group>
+
+</menu>
