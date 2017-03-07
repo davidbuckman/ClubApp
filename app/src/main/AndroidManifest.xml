@@ -26,10 +26,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreateAccountActivity"
-            android:label="CreateAccount">
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -48,6 +44,11 @@
         <activity android:name=".CreateClubActivity"></activity>
 
         <activity android:name=".AnnouncementsActivity"></activity>
+
+        <activity
+            android:name=".ClubSettingsActivity"
+            android:label="ClubSettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

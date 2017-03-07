@@ -1,6 +1,7 @@
 package edu.upenn.cis350.clubapp;
 
 import android.content.Intent;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +39,10 @@ import java.util.Set;
 
 public class AnnouncementsActivity extends AppCompatActivity {
 
+    // Navigation drawer resources
+    private String[] mNavigationOptions;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -59,6 +67,15 @@ public class AnnouncementsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_announcements);
 
+        // Initialize navigation drawer resources
+        mNavigationOptions = getResources().getStringArray(R.array.navigation_options);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_announcements);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.drawer_list_item, mNavigationOptions));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
          //initialize data structures
         clubChannels = new HashSet<String>();
@@ -70,7 +87,7 @@ public class AnnouncementsActivity extends AppCompatActivity {
         System.out.println("\nclub name in act =  " + clubName);
 
         //if club name is null, send back to main page
-        if(clubName == null){
+        if (clubName == null){
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         }
@@ -94,7 +111,7 @@ public class AnnouncementsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //get all channels for the club
-                for(DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubName).child("channels").getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubName).child("channels").getChildren()){
                     System.out.println("\n channel: " + snapshot.getKey());
                     clubChannels.add(snapshot.getKey());
                 }
@@ -156,10 +173,36 @@ public class AnnouncementsActivity extends AppCompatActivity {
 
     }
 
+    // Navigation drawer item click listener
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
 
-    //TODO: implement menu
+        /** Opens selected activity */
+        private void selectItem(int position) {
+            Intent i = new Intent();
+            i.putExtra("CLUB", clubName);
+            String selection = mNavigationOptions[position];
+            if (selection.equalsIgnoreCase("information")) {
+                i.setClass(AnnouncementsActivity.this, AnnouncementsActivity.class);
+            } else if (selection.equalsIgnoreCase("announcements")) {
+                i.setClass(AnnouncementsActivity.this, AnnouncementsActivity.class);
+            } else if (selection.equalsIgnoreCase("calendar")) {
+                i.setClass(AnnouncementsActivity.this, AnnouncementsActivity.class);
+            } else if (selection.equalsIgnoreCase("directory")) {
+                i.setClass(AnnouncementsActivity.this, AnnouncementsActivity.class);
+            } else if (selection.equalsIgnoreCase("club settings")) {
+                i.setClass(AnnouncementsActivity.this, ClubSettingsActivity.class);
+            }
 
-
+            // Highlight the selected item, update the title, and close the drawer
+            mDrawerList.setItemChecked(position, true);
+            mDrawerLayout.closeDrawer(mDrawerList);
+            startActivity(i);
+        }
+    }
 
 
 

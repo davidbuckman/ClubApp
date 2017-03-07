@@ -52,10 +52,6 @@ public class CreateClubActivity extends AppCompatActivity {
         btnCancel = (Button) findViewById(R.id.cancel_create_club_button);
         btnCreate = (Button) findViewById(R.id.create_club_button);
 
-
-        //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
-
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,7 +85,7 @@ public class CreateClubActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(chanString)) {
                     //add general
                     channels.put("general", true);
-                }else{
+                } else{
                     //parse string
                     String[] indivChannels = chanString.split(",");
                     for(String chan : indivChannels){

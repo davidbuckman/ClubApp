@@ -16,9 +16,9 @@ public class Club {
     public Club() {
     }
 
-    public Club(String name, String aboutText, String creatorUid) {
+    public Club(String name, String about, String creatorUid) {
         this.name = name;
-        this.about = aboutText;
+        this.about = about;
         this.members.put(creatorUid, new ClubMember(false, "Creator"));
     }
 
@@ -30,12 +30,12 @@ public class Club {
         this.name = name;
     }
 
-    public String getAboutText() {
+    public String getAbout() {
         return about;
     }
 
-    public void setAboutText(String aboutText) {
-        this.about = aboutText;
+    public void setAbout(String about) {
+        this.about = about;
     }
 
     public HashMap<String, Boolean> getChannels() {
