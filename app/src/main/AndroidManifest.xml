@@ -37,11 +37,17 @@
             android:label="@string/title_activity_reset_password"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".InvitationsActivity"
+            android:label="InvitationsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".SettingsActivity"
             android:label="SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".CreateClubActivity" />
-        <activity android:name=".AnnouncementsActivity_OLD" />
+        <activity
+            android:name=".CreateClubActivity"
+            android:label="CreateClubActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ClubSettingsActivity"
             android:label="ClubSettingsActivity"

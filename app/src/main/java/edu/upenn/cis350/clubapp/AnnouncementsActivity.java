@@ -49,7 +49,7 @@ public class AnnouncementsActivity extends AppCompatActivity
     //firebase auth for user id
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
-    String clubName;
+    String clubID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +83,7 @@ public class AnnouncementsActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 navigationHeaderName.setText(dataSnapshot.child("firstName").getValue() + " " + dataSnapshot.child("lastName").getValue());
-                navigationHeaderEmail.setText(dataSnapshot.child("email").getValue().toString());
+                navigationHeaderEmail.setText(dataSnapshot.child("email").getValue(String.class));
             }
 
             @Override
@@ -98,11 +98,11 @@ public class AnnouncementsActivity extends AppCompatActivity
         messages = new HashSet<ClubNotification>();
 
         // Determine club name (club ID) via intent extras
-        clubName = getIntent().getStringExtra("CLUB");
-        System.out.println("\nclub name in act =  " + clubName);
+        clubID = getIntent().getStringExtra("CLUB");
+        System.out.println("\nclub name in act =  " + clubID);
 
         // If club name is null, send back to main page
-        if (clubName == null){
+        if (clubID == null){
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         }
@@ -125,7 +125,7 @@ public class AnnouncementsActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //get all channels for the club
-                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubName).child("channels").getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("channels").getChildren()){
                     System.out.println("\n channel: " + snapshot.getKey());
                     clubChannels.add(snapshot.getKey());
                 }
@@ -200,10 +200,12 @@ public class AnnouncementsActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        Intent i = new Intent();
+        i.putExtra("CLUB", clubID);
 
+        int id = item.getItemId();
         if (id == R.id.nav_information) {
-            // Handle the camera action
+
         } else if (id == R.id.nav_announcements) {
 
         } else if (id == R.id.nav_calendar) {
@@ -211,8 +213,11 @@ public class AnnouncementsActivity extends AppCompatActivity
         } else if (id == R.id.nav_directory) {
 
         } else if (id == R.id.nav_club_settings) {
-
+            i.setClass(this, ClubSettingsActivity.class);
         }
+
+        startActivity(i);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
