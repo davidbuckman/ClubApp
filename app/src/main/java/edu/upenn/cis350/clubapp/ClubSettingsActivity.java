@@ -135,7 +135,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                 }
                             });
 
-                } else if (isAdmin(user, clubID)) {
+                } else if (!isAdmin(user, clubID)) {
                     Toast.makeText(ClubSettingsActivity.this, "Only admins can invite users!", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                 } else if (email.equals("")) {
