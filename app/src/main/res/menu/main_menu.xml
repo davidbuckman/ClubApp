@@ -3,9 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item
+        android:id="@+id/invitations"
+        android:icon="@drawable/ic_invitations"
+        app:showAsAction="always"
+        android:title="Invitations" />
+    <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_settings"
-        app:showAsAction="ifRoom"
-        android:title="Compose">
-    </item>
+        app:showAsAction="always"
+        android:title="Settings" />
 </menu>

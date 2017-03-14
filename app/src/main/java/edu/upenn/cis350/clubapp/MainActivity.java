@@ -2,7 +2,6 @@ package edu.upenn.cis350.clubapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Movie;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,14 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -27,16 +25,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
-
 
     private static Context mContext;
 
     private FloatingActionButton fab;
-
     ScaleAnimation shrinkAnim;
+
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     private TextView clubView;
@@ -53,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         mContext = this;
 
@@ -79,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         //Say Hello to our new FirebaseUI android Element, i.e., FirebaseRecyclerAdapter
         FirebaseRecyclerAdapter<Boolean,ClubViewHolder> adapter = new FirebaseRecyclerAdapter<Boolean, ClubViewHolder>(
                 Boolean.class,
-                R.layout.card_layout,
+                R.layout.card_layout_main,
                 ClubViewHolder.class,
                 //referencing the node where we want the database to store the data from our Object
                 ref
@@ -95,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
                          viewHolder.clubName.setText(name);
                          viewHolder.clubAbout.setText(about);
                          viewHolder.clubLink.setTag(R.string.club_id, key);
-
                      }
 
                      @Override
@@ -147,16 +141,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.settings:
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                intent.setClass(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.invitations:
+                intent.setClass(MainActivity.this, InvitationsActivity.class);
                 startActivity(intent);
                 return true;
             default:
@@ -174,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
     //ViewHolder for our Firebase UI
 
-    public static class ClubViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ClubViewHolder extends RecyclerView.ViewHolder {
         TextView clubName;
         TextView clubAbout;
         Button clubLink;
@@ -184,17 +182,15 @@ public class MainActivity extends AppCompatActivity {
             clubName = (TextView) v.findViewById(R.id.club_name);
             clubAbout = (TextView) v.findViewById(R.id.club_description);
             clubLink = (Button) v.findViewById(R.id.club_link);
-            clubLink.setOnClickListener(this);
-
-        }
-
-        @Override
-        public void onClick(View v){
-            System.out.println("Click" + clubName.getText().toString());
-            Intent i = new Intent(mContext, AnnouncementsActivity.class);
-            i.putExtra("CLUB", clubLink.getTag(R.string.club_id).toString());
-            mContext.startActivity(i);
-
+            clubLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("MainActivity", "Click" + clubName.getText());
+                    Intent i = new Intent(mContext, AnnouncementsActivity.class);
+                    i.putExtra("CLUB", clubLink.getTag(R.string.club_id).toString());
+                    mContext.startActivity(i);
+                }
+            });
         }
 
     }
