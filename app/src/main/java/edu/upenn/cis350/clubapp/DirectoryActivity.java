@@ -12,10 +12,12 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -197,7 +199,7 @@ public class DirectoryActivity extends AppCompatActivity
     }
 
 
-    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NotificationViewHolder>{
+    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.DirectoryViewHolder>{
 
         ArrayList<ClubMember> memberList;
 
@@ -211,14 +213,14 @@ public class DirectoryActivity extends AppCompatActivity
         }
 
         @Override
-        public RVAdapter.NotificationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public RVAdapter.DirectoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_layout_directory, parent, false);
-            RVAdapter.NotificationViewHolder nvh = new RVAdapter.NotificationViewHolder(v);
-            return nvh;
+            RVAdapter.DirectoryViewHolder dvh = new RVAdapter.DirectoryViewHolder(v);
+            return dvh;
         }
 
         @Override
-        public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, int position) {
+        public void onBindViewHolder(RVAdapter.DirectoryViewHolder holder, int position) {
             holder.user.setText(memberList.get(position).getName());
             holder.position.setText(memberList.get(position).getTitle());
         }
@@ -234,15 +236,29 @@ public class DirectoryActivity extends AppCompatActivity
         }
 
         //ViewHolder for our Firebase UI
-        public class NotificationViewHolder extends RecyclerView.ViewHolder{
+        public class DirectoryViewHolder extends RecyclerView.ViewHolder{
 
             TextView user;
             TextView position;
+            Button emailLink;
 
-            public NotificationViewHolder(View v) {
+            public DirectoryViewHolder(View v) {
                 super(v);
                 user = (TextView) v.findViewById(R.id.user_name);
                 position = (TextView) v.findViewById(R.id.user_position);
+                emailLink = (Button) v.findViewById(R.id.write_email);
+                emailLink.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("MainActivity", "Click to email " + user.getText());
+//                        Intent i = new Intent(mContext, AnnouncementsActivity.class);
+//                        i.putExtra("CLUB", clubLink.getTag(R.string.club_id).toString());
+//                        mContext.startActivity(i);
+                    }
+                });
+
+
+
             }
         }
     }
