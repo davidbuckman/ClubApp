@@ -209,7 +209,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         } else if (id == R.id.nav_announcements) {
 
         } else if (id == R.id.nav_calendar) {
-
+            i.setClass(this, CalendarActivity.class);
         } else if (id == R.id.nav_directory) {
 
         } else if (id == R.id.nav_club_settings) {
@@ -230,7 +230,6 @@ public class AnnouncementsActivity extends AppCompatActivity
         ArrayList<ClubNotification> messages;
 
         RVAdapter(HashSet<ClubNotification> msg){
-            System.out.println("ahhh");
             this.messageSet = msg;
             messages = new ArrayList(messageSet);
             for(ClubNotification notif : messages){
