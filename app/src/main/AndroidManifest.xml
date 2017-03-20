@@ -55,7 +55,9 @@
         <activity
             android:name=".AnnouncementsActivity"
             android:label="@string/title_activity_announcements2"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".directory" />
+        <activity android:name=".DirectoryActivity"></activity>
     </application>
 
 </manifest>

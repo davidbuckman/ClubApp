@@ -211,6 +211,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         } else if (id == R.id.nav_calendar) {
 
         } else if (id == R.id.nav_directory) {
+            i.setClass(this, DirectoryActivity.class);
 
         } else if (id == R.id.nav_club_settings) {
             i.setClass(this, ClubSettingsActivity.class);
