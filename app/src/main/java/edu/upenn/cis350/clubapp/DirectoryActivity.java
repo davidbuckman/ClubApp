@@ -12,8 +12,10 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,11 +26,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
 public class DirectoryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    //global list
+    ArrayList<ClubMember> membersList;
+
 
     //set up for recycler view
     private RecyclerView mRecyclerView;
@@ -49,7 +61,7 @@ public class DirectoryActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar); //TODO: figure out why this sits below
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +71,7 @@ public class DirectoryActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -83,10 +96,9 @@ public class DirectoryActivity extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-//        navigationHeaderEmail.setText(auth.getCurrentUser().getEmail());
 
         // Initialize data structures
-
+        membersList = new ArrayList<>(0);
 
         // Determine club name (club ID) via intent extras
         clubID = getIntent().getStringExtra("CLUB");
@@ -112,71 +124,44 @@ public class DirectoryActivity extends AppCompatActivity
 
 
 
-//        //get data and display
-//        DatabaseReference ref = mDatabaseReference;
-//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                //get all channels for the club
-//                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("channels").getChildren()){
-//                    System.out.println("\n channel: " + snapshot.getKey());
-//                    clubChannels.add(snapshot.getKey());
-//                }
-//                System.out.println("size of channel array= " + clubChannels.size());
-//
-//
-//                //look at club's channels to see if user is subscribed
-//                Iterator<String> iter = clubChannels.iterator();
-//                while (iter.hasNext()){
-//                    String channelID = iter.next();
-//                    for(DataSnapshot snapshot : dataSnapshot.child("channels").child(channelID).getChildren()){
-//                        System.out.println("\n curr channel: " + snapshot.getKey());
-//                        if(snapshot.getKey().toString().contentEquals("subscribers")){
-//                            for(DataSnapshot subshot : snapshot.getChildren()){
-//                                System.out.println("Sub to " + channelID + " = " + subshot.getKey());
-//                                if(subshot.getKey().equals(auth.getCurrentUser().getUid())){
-//                                    System.out.println("BINGO!");
-//                                    myChannels.add(channelID);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                System.out.println("size of my chan array= " + myChannels.size());
-//
-//
-//                final Iterator<String> myIter = myChannels.iterator();
-//                System.out.println("we have iter? " + myIter.hasNext());
-//                if(!myIter.hasNext()){
-//                    Toast.makeText(AnnouncementsActivity.this,
-//                            "You have no new messages!",
-//                            Toast.LENGTH_LONG).show();
-//                }
-//                while (myIter.hasNext()){
-//                    String channel = myIter.next();
-//                    for(DataSnapshot snapshot : dataSnapshot.child("messages").child(channel).getChildren()){
-//                        ClubNotification newNotif =
-//                                new ClubNotification(
-//                                        snapshot.child("author").getValue(String.class),
-//                                        channel,
-//                                        snapshot.child("content").getValue(String.class),
-//                                        snapshot.child("timeStamp").getValue(Long.class));
-//                        messages.add(newNotif);
-//                    }
-//
-//                }
-//
-//
-//                AnnouncementsActivity.RVAdapter adapter = new AnnouncementsActivity.RVAdapter(messages);
-//                mRecyclerView.setAdapter(adapter);
-//
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
+        //get data and display
+        DatabaseReference ref = mDatabaseReference;
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("Num snapshot members = " + dataSnapshot.getChildrenCount());
+
+                membersList = new ArrayList<ClubMember>((int)dataSnapshot.getChildrenCount());
+                //get all channels for the club
+                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("members").getChildren()){
+                    System.out.println("\n members: " + snapshot.getKey());
+                    System.out.println("isAdmin = " + snapshot.child("isAdmin").getValue());
+                    System.out.println("title = " + snapshot.child("title").getValue());
+                    boolean isAdmin = true;
+                    if(snapshot.child("isAdmin").getValue().toString().equals("false")){
+                        isAdmin = false;
+                    }
+                    membersList.add(new ClubMember(snapshot.getKey(), isAdmin , snapshot.child("title").getValue().toString()));
+
+                }
+
+                if(membersList.isEmpty()){
+                    Toast.makeText(DirectoryActivity.this,
+                            "This club has no members!",
+                            Toast.LENGTH_LONG).show();
+                }
+
+                System.out.println("memList:");
+                RVAdapter adapter = new RVAdapter(membersList);
+                mRecyclerView.setAdapter(adapter);
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
     }
 
@@ -192,6 +177,7 @@ public class DirectoryActivity extends AppCompatActivity
         if (id == R.id.nav_information) {
 
         } else if (id == R.id.nav_announcements) {
+            i.setClass(this, AnnouncementsActivity.class);
 
         } else if (id == R.id.nav_calendar) {
 
@@ -208,5 +194,56 @@ public class DirectoryActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NotificationViewHolder>{
+
+        ArrayList<ClubMember> memberList;
+
+        RVAdapter(ArrayList<ClubMember> mem){
+            System.out.println("In RVAdapter");
+            this.memberList = mem;
+            for(ClubMember cMember : memberList){
+                System.out.println(cMember.getName());
+            }
+            Collections.sort(memberList);
+        }
+
+        @Override
+        public RVAdapter.NotificationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_layout_directory, parent, false);
+            RVAdapter.NotificationViewHolder nvh = new RVAdapter.NotificationViewHolder(v);
+            return nvh;
+        }
+
+        @Override
+        public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, int position) {
+            holder.user.setText(memberList.get(position).getName());
+            holder.position.setText(memberList.get(position).getTitle());
+        }
+
+        @Override
+        public int getItemCount() {
+            return memberList.size();
+        }
+
+        @Override
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+        }
+
+        //ViewHolder for our Firebase UI
+        public class NotificationViewHolder extends RecyclerView.ViewHolder{
+
+            TextView user;
+            TextView position;
+
+            public NotificationViewHolder(View v) {
+                super(v);
+                user = (TextView) v.findViewById(R.id.user_name);
+                position = (TextView) v.findViewById(R.id.user_position);
+            }
+        }
     }
 }
