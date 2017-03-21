@@ -56,7 +56,10 @@
             android:name=".AnnouncementsActivity"
             android:label="@string/title_activity_announcements2"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".DirectoryActivity"></activity>
+        <activity
+            android:name=".DirectoryActivity"
+            android:label="ClubDirectory"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".CalendarActivity"
             android:label="CalendarActivity"
