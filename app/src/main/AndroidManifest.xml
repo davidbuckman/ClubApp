@@ -56,8 +56,15 @@
             android:name=".AnnouncementsActivity"
             android:label="@string/title_activity_announcements2"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".directory" />
         <activity android:name=".DirectoryActivity"></activity>
+        <activity
+            android:name=".CalendarActivity"
+            android:label="CalendarActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CalendarEventActivity"
+            android:label="CalendarEventActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

@@ -10,17 +10,19 @@ import java.util.StringTokenizer;
 public class ClubEvent {
 
     String author, description, name;
-    Date date;
+    String eventId;
+    Long date;
 
     public ClubEvent() {
 
     }
 
-    public ClubEvent(String author, String description, String name, Date date) {
+    public ClubEvent(String author, String description, String name, Long date, String eventId) {
         this.author = author;
         this.description = description;
         this.name = name;
         this.date = date;
+        this.eventId = eventId;
     }
 
     public String getAuthor() {
@@ -47,11 +49,19 @@ public class ClubEvent {
         this.name = name;
     }
 
-    public Date getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Long date) {
         this.date = date;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }
