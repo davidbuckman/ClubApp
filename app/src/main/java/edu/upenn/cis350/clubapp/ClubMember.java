@@ -8,13 +8,15 @@ public class ClubMember implements Comparable{
     public boolean isAdmin;
     public String title;
     public String name;
+    public String userId;
     public int unreadNotifs;
 
     public ClubMember() {
     }
 
-    public ClubMember(String name, boolean isAdmin, String title) {
+    public ClubMember(String name, String id, boolean isAdmin, String title) {
         this.name = name;
+        this.userId = id;
         this.isAdmin = isAdmin;
         this.title = title;
     }
@@ -28,6 +30,8 @@ public class ClubMember implements Comparable{
     }
 
     public String getName() {  return this.name; }
+
+    public String getUserId() { return this.userId; }
 
     public void setName(String nm) { this.name = nm; }
 

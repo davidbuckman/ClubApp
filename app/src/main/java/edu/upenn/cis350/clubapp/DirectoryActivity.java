@@ -1,6 +1,8 @@
 package edu.upenn.cis350.clubapp;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -143,7 +145,7 @@ public class DirectoryActivity extends AppCompatActivity
                     if(snapshot.child("isAdmin").getValue().toString().equals("false")){
                         isAdmin = false;
                     }
-                    membersList.add(new ClubMember(snapshot.getKey(), isAdmin , snapshot.child("title").getValue().toString()));
+                    membersList.add(new ClubMember(snapshot.getKey(), snapshot.child("userId").getValue().toString(), isAdmin , snapshot.child("title").getValue().toString()));
 
                 }
 
@@ -223,6 +225,7 @@ public class DirectoryActivity extends AppCompatActivity
         public void onBindViewHolder(RVAdapter.DirectoryViewHolder holder, int position) {
             holder.user.setText(memberList.get(position).getName());
             holder.position.setText(memberList.get(position).getTitle());
+            holder.userId = memberList.get(position).getUserId();
         }
 
         @Override
@@ -238,6 +241,7 @@ public class DirectoryActivity extends AppCompatActivity
         //ViewHolder for our Firebase UI
         public class DirectoryViewHolder extends RecyclerView.ViewHolder{
 
+            String userId;
             TextView user;
             TextView position;
             Button emailLink;
@@ -251,9 +255,69 @@ public class DirectoryActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
                         Log.d("MainActivity", "Click to email " + user.getText());
-//                        Intent i = new Intent(mContext, AnnouncementsActivity.class);
-//                        i.putExtra("CLUB", clubLink.getTag(R.string.club_id).toString());
-//                        mContext.startActivity(i);
+                        DatabaseReference mDB = database.getReference().child("users");
+                        mDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                //System.out.println("Look for: " + userId);
+
+                                String emailTo = "";
+                                String targetEmail = "";
+
+
+                                //find member with coordinating ID
+                                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                    //System.out.println("Found: " + snapshot.getKey().toString());
+
+                                    if(snapshot.getKey().toString().equals(userId)){
+
+                                        //email this child
+                                        System.out.println("email: " + snapshot.child("email").getValue());
+                                        targetEmail = snapshot.child("email").getValue().toString();
+                                        emailTo = "mailto:" + targetEmail;
+                                        //break; //TODO: this is bad style
+                                    }
+                                }
+                                System.out.println("emailing....");
+//                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailTo, null));
+//                                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Hello from Club App");
+//                                startActivity(Intent.createChooser(emailIntent, null));
+
+//                                Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+//                                sendIntent.setType("plain/text");
+//                                sendIntent.setData(Uri.parse(emailTo));
+//                                sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+//                                startActivity(sendIntent);
+
+                                if(targetEmail.isEmpty()){
+                                    Toast.makeText(DirectoryActivity.this,
+                                            "No email available! Sorry!",
+                                            Toast.LENGTH_LONG).show();
+                                } else{
+                                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                                    emailIntent.setData(Uri.parse(emailTo));
+                                    try{
+                                        startActivity(emailIntent);
+                                    } catch (ActivityNotFoundException e){
+                                        //TODO: Handle cases where no email app is available
+                                        Toast.makeText(DirectoryActivity.this,
+                                                "You have no email app available. " +
+                                                        "\nThe requested email is: " + targetEmail,
+                                                Toast.LENGTH_LONG).show();
+
+                                    }
+                                }
+
+
+
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+
                     }
                 });
 
