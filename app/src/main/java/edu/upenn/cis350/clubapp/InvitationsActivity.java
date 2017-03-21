@@ -123,7 +123,7 @@ public class InvitationsActivity extends AppCompatActivity {
             }
         });
 
-        user.child("clubs").child(clubID).setValue(true);
+        user.child("clubs").child(clubID).setValue(adminStatus);
         user.child("invitations").child(clubID).removeValue();
 
 
@@ -131,6 +131,7 @@ public class InvitationsActivity extends AppCompatActivity {
         userInClub.child("isAdmin").setValue(adminStatus);
         userInClub.child("title").setValue("General Memeber");
         userInClub.child("unreadNotifs").setValue(0);
+
 
         Log.d("InvitationsActivity", "Accepting invitation to " + clubID);
     }
