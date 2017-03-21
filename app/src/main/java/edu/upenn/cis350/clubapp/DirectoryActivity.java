@@ -126,10 +126,10 @@ public class DirectoryActivity extends AppCompatActivity
         mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
-
         //get data and display
         DatabaseReference ref = mDatabaseReference;
+
+
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -279,33 +279,36 @@ public class DirectoryActivity extends AppCompatActivity
                                     }
                                 }
                                 System.out.println("emailing....");
-//                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailTo, null));
-//                                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Hello from Club App");
-//                                startActivity(Intent.createChooser(emailIntent, null));
-
-//                                Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-//                                sendIntent.setType("plain/text");
-//                                sendIntent.setData(Uri.parse(emailTo));
-//                                sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
-//                                startActivity(sendIntent);
 
                                 if(targetEmail.isEmpty()){
                                     Toast.makeText(DirectoryActivity.this,
                                             "No email available! Sorry!",
                                             Toast.LENGTH_LONG).show();
                                 } else{
-                                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                                    emailIntent.setData(Uri.parse(emailTo));
-                                    try{
-                                        startActivity(emailIntent);
-                                    } catch (ActivityNotFoundException e){
-                                        //TODO: Handle cases where no email app is available
-                                        Toast.makeText(DirectoryActivity.this,
-                                                "You have no email app available. " +
-                                                        "\nThe requested email is: " + targetEmail,
-                                                Toast.LENGTH_LONG).show();
+//                                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+//                                    emailIntent.setData(Uri.parse(emailTo));
+//                                    try{
+//                                        startActivity(emailIntent);
+//                                    } catch (ActivityNotFoundException e){
+//                                        //TODO: Handle cases where no email app is available
+//                                        Toast.makeText(DirectoryActivity.this,
+//                                                "You have no email app available. " +
+//                                                        "\nThe requested email is: " + targetEmail,
+//                                                Toast.LENGTH_LONG).show();
+//
+//                                    }
 
-                                    }
+                                    /* Create the Intent */
+                                    final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+                                    /* Fill it with Data */
+                                    emailIntent.setType("plain/text");
+                                    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{targetEmail});
+                                    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject");
+                                    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Text");
+
+                                    /* Send it off to the Activity-Chooser */
+                                    startActivity(Intent.createChooser(emailIntent, "Sending mail to: " + targetEmail));
                                 }
 
 
