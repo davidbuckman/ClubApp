@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
     private EditText userEmail;
     private Button btnInviteUser;
     private Button inviteUser;
+    private CheckBox adminBox;
 
     private ProgressBar progressBar;
     private FirebaseAuth.AuthStateListener authListener;
@@ -85,9 +87,12 @@ public class ClubSettingsActivity extends AppCompatActivity {
         userEmail = (EditText) findViewById(R.id.user_email);
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
         inviteUser = (Button) findViewById(R.id.inviteUser);
+        adminBox = (CheckBox) findViewById(R.id.adminBox);
 
         userEmail.setVisibility(View.GONE);
         inviteUser.setVisibility(View.GONE);
+        adminBox.setVisibility(View.GONE);
+
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -100,6 +105,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 userEmail.setVisibility(View.VISIBLE);
                 inviteUser.setVisibility(View.VISIBLE);
+                adminBox.setVisibility(View.VISIBLE);
             }
         });
 
@@ -108,6 +114,9 @@ public class ClubSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email = userEmail.getText().toString().trim();
+                // check if admin status is checked.
+                final boolean adminStatus = adminBox.isChecked();
+
                 if (isAdmin(user, clubID) && !email.equals("")) {
                     mDatabaseReference.child("users").orderByChild("email").equalTo(email)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -121,9 +130,10 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         Toast.makeText(ClubSettingsActivity.this, "There is no user with that email!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
+                                        // successful invite send
                                         String uid = dataSnapshot.getChildren().iterator().next().getKey();
                                         // Update user's invited to list
-                                        mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).setValue(true);
+                                        mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).setValue(adminStatus);
 
                                         Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);

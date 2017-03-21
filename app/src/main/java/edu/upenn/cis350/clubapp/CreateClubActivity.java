@@ -104,11 +104,14 @@ public class CreateClubActivity extends AppCompatActivity {
                 //add to database
                 mDatabaseReference.child("clubs").child(name).setValue(newClub);
 
+                // TODO: need to add club to user's club list.
+
                 //update user profile
                 mDatabaseReference.child("users").child(auth.getCurrentUser().getUid()).child("clubs").child(name).setValue(true);
 
                 //go back to main
                 startActivity(new Intent(CreateClubActivity.this, MainActivity.class));
+
 
 
             }

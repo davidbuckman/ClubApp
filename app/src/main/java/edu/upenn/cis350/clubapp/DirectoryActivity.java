@@ -129,7 +129,7 @@ public class DirectoryActivity extends AppCompatActivity
         //get data and display
         DatabaseReference ref = mDatabaseReference;
 
-
+        // maintains the user lists for the club
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -139,7 +139,7 @@ public class DirectoryActivity extends AppCompatActivity
                 //get all channels for the club
                 for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("members").getChildren()){
                     System.out.println("\n members: " + snapshot.getKey());
-                    System.out.println("isAdmin = " + snapshot.child("isAdmin").getValue());
+                    System.out.println("isAdmin = " + snapshot.child("isAdmin").getValue().toString());
                     System.out.println("title = " + snapshot.child("title").getValue());
                     boolean isAdmin = true;
                     if(snapshot.child("isAdmin").getValue().toString().equals("false")){

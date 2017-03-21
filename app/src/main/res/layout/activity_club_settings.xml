@@ -49,6 +49,12 @@
             android:layout_height="30dp"
             android:visibility="gone" />
 
+        <CheckBox
+            android:id="@+id/adminBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add as Admin" />
+
         <Button
             android:id="@+id/inviteUser"
             style="?android:textAppearanceSmall"
