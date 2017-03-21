@@ -39,6 +39,8 @@ public class InvitationsActivity extends AppCompatActivity {
     private TextView mNoInvitations;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
+    static boolean adminStatus = false;
+
 
     //Getting reference to Firebase Database
     static FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -109,12 +111,24 @@ public class InvitationsActivity extends AppCompatActivity {
 
     protected static void acceptInvitation(String clubID) {
         DatabaseReference user  = mDatabaseReference.child("users").child(userID);
+        // get boolean for admin status
+        user.child("invitations").child(clubID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                adminStatus = (boolean) dataSnapshot.getValue();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
         user.child("clubs").child(clubID).setValue(true);
         user.child("invitations").child(clubID).removeValue();
 
 
         DatabaseReference userInClub = mDatabaseReference.child("clubs").child(clubID).child("members").child(userID);
-        userInClub.child("isAdmin").setValue(false);
+        userInClub.child("isAdmin").setValue(adminStatus);
         userInClub.child("title").setValue("General Memeber");
         userInClub.child("unreadNotifs").setValue(0);
 
