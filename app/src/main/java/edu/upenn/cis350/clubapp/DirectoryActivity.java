@@ -141,11 +141,21 @@ public class DirectoryActivity extends AppCompatActivity
                     System.out.println("\n members: " + snapshot.getKey());
                     System.out.println("isAdmin = " + snapshot.child("isAdmin").getValue().toString());
                     System.out.println("title = " + snapshot.child("title").getValue());
+                    String title = "";
+                    if (snapshot.child("title").getValue() != null) {
+                        title = snapshot.child("title").getValue().toString();
+                    }
+
+                    String userId = "";
+                    if (snapshot.child("userId").getValue() != null) {
+                        userId = snapshot.child("userId").getValue().toString();
+                    }
+
                     boolean isAdmin = true;
                     if(snapshot.child("isAdmin").getValue().toString().equals("false")){
                         isAdmin = false;
                     }
-                    membersList.add(new ClubMember(snapshot.getKey(), snapshot.child("userId").getValue().toString(), isAdmin , snapshot.child("title").getValue().toString()));
+                    membersList.add(new ClubMember(snapshot.getKey(), userId, isAdmin , title));
 
                 }
 
