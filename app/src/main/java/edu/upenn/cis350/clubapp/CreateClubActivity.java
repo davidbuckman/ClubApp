@@ -111,6 +111,7 @@ public class CreateClubActivity extends AppCompatActivity {
                 startActivity(new Intent(CreateClubActivity.this, MainActivity.class));
 
 
+
             }
         });
 

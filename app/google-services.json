@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "796556113601",
+    "firebase_url": "https://club-app-c9141.firebaseio.com",
+    "project_id": "club-app-c9141",
+    "storage_bucket": "club-app-c9141.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796556113601:android:2d745a45a03a5046",
+        "android_client_info": {
+          "package_name": "edu.upenn.cis350.clubapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "796556113601-jm06soalssrik9h0813a1hcfb4l51vau.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.upenn.cis350.clubapp",
+            "certificate_hash": "c0dfa64ccf323fe61448bfe51898ee7ac17c0fde"
+          }
+        },
+        {
+          "client_id": "796556113601-9lcnutth3n3klec8mpjcg96o42e52bql.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.upenn.cis350.clubapp",
+            "certificate_hash": "04a3b1d7075a90fe407158eb77a005f1ac4783ad"
+          }
+        },
+        {
+          "client_id": "796556113601-1cp5sutvd8ntph0laklfdv4e8rqmjfic.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.upenn.cis350.clubapp",
+            "certificate_hash": "c87cbcfe7e1309aefb9c2225fe77029dcea9e857"
+          }
+        },
+        {
+          "client_id": "796556113601-rbvvia3ehq70kqbbh938s0huocl0vom2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA04-5upB_xdkJFknYAqQFdiDwpcVHcKKA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "796556113601-rbvvia3ehq70kqbbh938s0huocl0vom2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
