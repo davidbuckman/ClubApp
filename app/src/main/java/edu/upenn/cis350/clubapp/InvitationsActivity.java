@@ -130,8 +130,6 @@ public class InvitationsActivity extends AppCompatActivity {
         DatabaseReference userInClub = mDatabaseReference.child("clubs").child(clubID).child("members").child(userID);
         userInClub.child("isAdmin").setValue(adminStatus);
         userInClub.child("title").setValue("General Memeber");
-        userInClub.child("unreadNotifs").setValue(0);
-
 
         Log.d("InvitationsActivity", "Accepting invitation to " + clubID);
     }

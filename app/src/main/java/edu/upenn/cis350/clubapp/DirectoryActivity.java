@@ -155,7 +155,7 @@ public class DirectoryActivity extends AppCompatActivity
                     if(snapshot.child("isAdmin").getValue().toString().equals("false")){
                         isAdmin = false;
                     }
-                    membersList.add(new ClubMember(snapshot.getKey(), userId, isAdmin , title));
+                    membersList.add(new ClubMember(snapshot.getKey(), isAdmin , title));
 
                 }
 
@@ -218,9 +218,9 @@ public class DirectoryActivity extends AppCompatActivity
         RVAdapter(ArrayList<ClubMember> mem){
             System.out.println("In RVAdapter");
             this.memberList = mem;
-            for(ClubMember cMember : memberList){
-                System.out.println(cMember.getName());
-            }
+//            for(ClubMember cMember : memberList){
+//                System.out.println(cMember.getName());
+//            }
             Collections.sort(memberList);
         }
 
@@ -233,7 +233,8 @@ public class DirectoryActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(RVAdapter.DirectoryViewHolder holder, int position) {
-            holder.user.setText(memberList.get(position).getName());
+            // TODO: fix getUserID
+            holder.user.setText(memberList.get(position).getUserId());
             holder.position.setText(memberList.get(position).getTitle());
             holder.userId = memberList.get(position).getUserId();
         }

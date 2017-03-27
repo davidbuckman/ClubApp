@@ -7,15 +7,12 @@ package edu.upenn.cis350.clubapp;
 public class ClubMember implements Comparable{
     public boolean isAdmin;
     public String title;
-    public String name;
     public String userId;
-    public int unreadNotifs;
 
     public ClubMember() {
     }
 
-    public ClubMember(String name, String id, boolean isAdmin, String title) {
-        this.name = name;
+    public ClubMember(String id, boolean isAdmin, String title) {
         this.userId = id;
         this.isAdmin = isAdmin;
         this.title = title;
@@ -29,11 +26,9 @@ public class ClubMember implements Comparable{
         return this.isAdmin ? this.title : "General Member";
     }
 
-    public String getName() {  return this.name; }
 
     public String getUserId() { return this.userId; }
 
-    public void setName(String nm) { this.name = nm; }
 
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
@@ -41,15 +36,6 @@ public class ClubMember implements Comparable{
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public int addUnreadNotification() {
-        this.unreadNotifs++;
-        return this.unreadNotifs;
-    }
-
-    public void resetUnreadNotifcations() {
-        this.unreadNotifs = 0;
     }
 
     @Override
@@ -63,7 +49,7 @@ public class ClubMember implements Comparable{
             return 1;
         } else{
             //both admin or both general users
-            this.getName().compareTo(other.getName());
+            this.title.compareTo(other.title);
         }
 
 

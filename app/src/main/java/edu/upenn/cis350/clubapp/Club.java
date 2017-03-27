@@ -16,10 +16,10 @@ public class Club {
     public Club() {
     }
 
-    public Club(String name, String about, String creatorUid) {
+    public Club(String name, String about, String creatorUid, boolean isAdmin) {
         this.name = name;
         this.about = about;
-        this.members.put(creatorUid, new ClubMember(creatorUid, creatorUid, false, "Creator"));
+        this.members.put(creatorUid, new ClubMember(creatorUid, isAdmin, "Creator"));
     }
 
     public String getName() {
