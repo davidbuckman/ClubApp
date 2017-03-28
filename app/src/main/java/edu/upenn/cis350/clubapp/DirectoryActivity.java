@@ -155,7 +155,9 @@ public class DirectoryActivity extends AppCompatActivity
                     if(snapshot.child("isAdmin").getValue().toString().equals("false")){
                         isAdmin = false;
                     }
-                    membersList.add(new ClubMember(snapshot.getKey(), userId, isAdmin , title));
+
+
+                    membersList.add(new ClubMember(snapshot.getKey(), snapshot.getKey(), isAdmin , snapshot.child("title").getValue().toString()));
 
                 }
 
