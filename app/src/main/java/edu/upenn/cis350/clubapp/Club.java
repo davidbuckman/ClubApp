@@ -19,7 +19,7 @@ public class Club {
     public Club(String name, String about, String creatorUid, boolean isAdmin) {
         this.name = name;
         this.about = about;
-        this.members.put(creatorUid, new ClubMember(creatorUid, isAdmin, "Creator"));
+        this.members.put(creatorUid, new ClubMember(isAdmin, "Creator"));
     }
 
     public String getName() {

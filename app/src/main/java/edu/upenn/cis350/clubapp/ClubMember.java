@@ -5,15 +5,17 @@ package edu.upenn.cis350.clubapp;
  */
 
 public class ClubMember implements Comparable{
+    //allows for additional capabilities for managing club
     public boolean isAdmin;
+    //role in club
     public String title;
-    public String userId;
+
 
     public ClubMember() {
     }
 
-    public ClubMember(String id, boolean isAdmin, String title) {
-        this.userId = id;
+    public ClubMember(boolean isAdmin, String title) {
+
         this.isAdmin = isAdmin;
         this.title = title;
     }
@@ -25,10 +27,6 @@ public class ClubMember implements Comparable{
     public String getTitle() {
         return this.isAdmin ? this.title : "General Member";
     }
-
-
-    public String getUserId() { return this.userId; }
-
 
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
@@ -42,7 +40,6 @@ public class ClubMember implements Comparable{
     public int compareTo(Object o) {
         ClubMember other = (ClubMember) o;
 
-
         if(this.getIsAdmin() == true && other.getIsAdmin() == false){
             return -1;
         } else if(this.getIsAdmin() == false && other.getIsAdmin() == true){
@@ -51,9 +48,6 @@ public class ClubMember implements Comparable{
             //both admin or both general users
             this.title.compareTo(other.title);
         }
-
-
-
         return 0;
     }
 }

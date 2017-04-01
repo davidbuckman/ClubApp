@@ -84,8 +84,10 @@ public class MainActivity extends AppCompatActivity {
                 mDatabaseReference.child("clubs").child(key).addValueEventListener(new ValueEventListener() {
                      @Override
                      public void onDataChange(DataSnapshot dataSnapshot) {
-                         System.out.println("CHANGES!!!! : " + dataSnapshot.child("name").getValue(String.class));
-                         String name = dataSnapshot.child("name").getValue(String.class);
+                         Log.d("location testing", "in main");
+//                         System.out.println("CHANGES!!!! : " + dataSnapshot.child("name").getValue(String.class));
+                         System.out.println("CHANGES!!!! : " + dataSnapshot.getKey());
+                         String name = dataSnapshot.getKey().toString();
                          String about = dataSnapshot.child("about").getValue(String.class);
                          viewHolder.clubName.setText(name);
                          viewHolder.clubAbout.setText(about);
