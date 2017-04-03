@@ -31,6 +31,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
     private EditText userEmail;
     private Button btnInviteUser;
     private Button inviteUser;
+    private Button leaveGroup;
 
     private ProgressBar progressBar;
     private FirebaseAuth.AuthStateListener authListener;
@@ -85,6 +86,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
         userEmail = (EditText) findViewById(R.id.user_email);
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
         inviteUser = (Button) findViewById(R.id.inviteUser);
+        leaveGroup = (Button) findViewById(R.id.leave_club_button);
 
         userEmail.setVisibility(View.GONE);
         inviteUser.setVisibility(View.GONE);
@@ -108,7 +110,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email = userEmail.getText().toString().trim();
-                if (isAdmin(user, clubID) && !email.equals("")) {
+                if (!email.equals("")) {
                     mDatabaseReference.child("users").orderByChild("email").equalTo(email)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -121,12 +123,27 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         Toast.makeText(ClubSettingsActivity.this, "There is no user with that email!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
-                                        String uid = dataSnapshot.getChildren().iterator().next().getKey();
-                                        // Update user's invited to list
-                                        mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).setValue(true);
+                                        final String inviteeUid = dataSnapshot.getChildren().iterator().next().getKey();
+                                        mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin")
+                                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        boolean isAdmin = (boolean) dataSnapshot.getValue();
+                                                        if (isAdmin) {
+                                                            // Update user's invited to list
+                                                            mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).setValue(true);
+                                                            Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
+                                                            progressBar.setVisibility(View.GONE);
+                                                        } else {
+                                                            Toast.makeText(ClubSettingsActivity.this, "Only admins can invite users!", Toast.LENGTH_SHORT).show();
+                                                            progressBar.setVisibility(View.GONE);
+                                                        }
+                                                    }
 
-                                        Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
-                                        progressBar.setVisibility(View.GONE);
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                    }
+                                                });
                                     }
                                 }
 
@@ -135,9 +152,6 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                 }
                             });
 
-                } else if (!isAdmin(user, clubID)) {
-                    Toast.makeText(ClubSettingsActivity.this, "Only admins can invite users!", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
                 } else if (email.equals("")) {
                     userEmail.setError("Enter an email");
                     progressBar.setVisibility(View.GONE);
@@ -147,11 +161,16 @@ public class ClubSettingsActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    public boolean isAdmin(FirebaseUser user, String clubID) {
-        // TODO
-        return true;
+        leaveGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDatabaseReference.child("users").child(user.getUid()).child("clubs").child(clubID).removeValue();
+                mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).removeValue();
+                Intent intent = new Intent(ClubSettingsActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override

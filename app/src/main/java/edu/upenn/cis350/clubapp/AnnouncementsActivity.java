@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,6 +49,7 @@ public class AnnouncementsActivity extends AppCompatActivity
 
     //firebase auth for user id
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseUser user = auth.getCurrentUser();
 
     String clubID;
 
@@ -58,14 +60,30 @@ public class AnnouncementsActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        boolean isAdmin = (boolean) dataSnapshot.getValue();
+                        if (isAdmin) {
+                            fab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }
+                            });
+                        } else {
+                            fab.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -207,7 +225,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         if (id == R.id.nav_information) {
 
         } else if (id == R.id.nav_announcements) {
-
+            i.setClass(this, AnnouncementsActivity.class);
         } else if (id == R.id.nav_calendar) {
 
         } else if (id == R.id.nav_directory) {
@@ -217,6 +235,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         }
 
         startActivity(i);
+        finish();
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
