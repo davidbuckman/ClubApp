@@ -172,6 +172,7 @@ public class DirectoryActivity extends AppCompatActivity
 
 
                 if(membersMap.isEmpty()){
+                    // TODO: is this toast ever displayed?
                     Toast.makeText(DirectoryActivity.this,
                             "This club has no members!",
                             Toast.LENGTH_LONG).show();
