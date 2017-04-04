@@ -230,6 +230,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+                                        //TODO: remove user from clubs, remove user from users
                                         Toast.makeText(SettingsActivity.this, "Your profile is deleted:( Create a account now!", Toast.LENGTH_SHORT).show();
                                         startActivity(new Intent(SettingsActivity.this, SignupActivity.class));
                                         finish();

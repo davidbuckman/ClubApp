@@ -43,6 +43,15 @@
             android:maxLines="1"
             android:singleLine="true" />
 
+        <EditText
+            android:id="@+id/user_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="true"
+            android:hint="Title"
+            android:maxLines="1"
+            android:singleLine="true" />
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="30dp"

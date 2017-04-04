@@ -24,9 +24,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 /**
  * Created by david on 3/7/2017.
@@ -40,6 +43,7 @@ public class InvitationsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     static boolean adminStatus = false;
+    static String title = "";
 
 
     //Getting reference to Firebase Database
@@ -80,19 +84,20 @@ public class InvitationsActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         //Say Hello to our new FirebaseUI android Element, i.e., FirebaseRecyclerAdapter
-        mRecyclerView.setAdapter(new FirebaseRecyclerAdapter<Boolean, InvitationViewHolder>(
-                Boolean.class,
+        mRecyclerView.setAdapter(new FirebaseRecyclerAdapter<ClubInvitation, InvitationViewHolder>(
+                ClubInvitation.class,
                 R.layout.card_layout_invitations,
                 InvitationViewHolder.class,
                 mDatabaseReference.child("users").child(userID).child("invitations")
                 ) {
                     @Override
-                    protected void populateViewHolder(final InvitationViewHolder viewHolder, final Boolean model, int position) {
+                    protected void populateViewHolder(final InvitationViewHolder viewHolder, final ClubInvitation model, int position) {
                         final String key = this.getRef(position).getKey();
                         mDatabaseReference.child("clubs").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 //TODO: invitation doesn't contain name - removing "null pointer" causes error
+                                System.out.println("WILL THROW ERROR?");
                                 Log.d("InvitationsActivity", "null pointer:" + dataSnapshot.child("name").getValue(String.class));
                                 String name = dataSnapshot.child("name").getValue(String.class);
                                 String about = dataSnapshot.child("about").getValue(String.class);
@@ -116,7 +121,8 @@ public class InvitationsActivity extends AppCompatActivity {
         user.child("invitations").child(clubID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                adminStatus = (boolean) dataSnapshot.getValue();
+                adminStatus = (boolean) dataSnapshot.child("isAdmin").getValue();
+                title = dataSnapshot.child("title").getValue().toString();
             }
 
             @Override
@@ -124,13 +130,15 @@ public class InvitationsActivity extends AppCompatActivity {
             }
         });
 
-        user.child("clubs").child(clubID).setValue(adminStatus);
+        //TODO: overrode to set value to true
+        user.child("clubs").child(clubID).setValue(true);
         user.child("invitations").child(clubID).removeValue();
+        System.out.println("accepted invite to " + clubID);
 
 
         DatabaseReference userInClub = mDatabaseReference.child("clubs").child(clubID).child("members").child(userID);
         userInClub.child("isAdmin").setValue(adminStatus);
-        userInClub.child("title").setValue("General Memeber");
+        userInClub.child("title").setValue(title);
 
         Log.d("InvitationsActivity", "Accepting invitation to " + clubID);
     }
