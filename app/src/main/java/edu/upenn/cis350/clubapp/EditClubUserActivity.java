@@ -102,6 +102,14 @@ public class EditClubUserActivity extends AppCompatActivity {
             }
         });
 
+        removeUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDatabaseReference.child("clubs").child(clubID).child("members").child(userID).removeValue();
+                mDatabaseReference.child("users").child(userID).child("clubs").child(clubID).removeValue();
+                Toast.makeText(EditClubUserActivity.this, "removed user", Toast.LENGTH_LONG).show();
+            }
+        });
         editUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

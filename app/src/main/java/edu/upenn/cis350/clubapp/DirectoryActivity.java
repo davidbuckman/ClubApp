@@ -58,7 +58,7 @@ public class DirectoryActivity extends AppCompatActivity
 
     //set up for recycler view
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
 
@@ -74,6 +74,7 @@ public class DirectoryActivity extends AppCompatActivity
 
 
     String clubID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +125,6 @@ public class DirectoryActivity extends AppCompatActivity
 
         // Initialize data structures
         membersMap = new HashMap<>(0);
-        usersMap = new HashMap<>(0);
 
         // Determine club name (club ID) via intent extras
         clubID = getIntent().getStringExtra("CLUB");
@@ -152,14 +152,14 @@ public class DirectoryActivity extends AppCompatActivity
         //get data and display
         DatabaseReference ref = mDatabaseReference;
 
+
          //maintains the user lists for the club
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-        //mDatabaseReference.addValueEventListener(new ValueEventListener() {
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                membersMap = new HashMap<String, ClubMember>();
                 System.out.println("2-- Num snapshot members = " + dataSnapshot.getChildrenCount());
 
-                //membersList = new ArrayList<ClubMember>((int)dataSnapshot.getChildrenCount());
 
                 //get all members for the club
                 for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("members").getChildren()){
@@ -258,9 +258,7 @@ public class DirectoryActivity extends AppCompatActivity
                     System.out.println("gen list size = " + genUsers.size());
 
                 }
-
-
-                RVAdapter adapter = new RVAdapter(membersMap, admins, adminsWithUIDs, genUsers, genUsersWithUIDs);
+                adapter = new RVAdapter(membersMap, admins, adminsWithUIDs, genUsers, genUsersWithUIDs);
                 mRecyclerView.setAdapter(adapter);
 
 
@@ -397,6 +395,7 @@ public class DirectoryActivity extends AppCompatActivity
 
         }
 
+
         @Override
         public int getItemCount() {
             return memberList.size();
@@ -431,6 +430,7 @@ public class DirectoryActivity extends AppCompatActivity
                             intent.putExtra("CLUB", clubID);
                             intent.putExtra("USER", uid);
                             startActivity(intent);
+                            finish();
                         }
                     });
                 } else {
