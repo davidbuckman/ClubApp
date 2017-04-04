@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 public class ClubSettingsActivity extends AppCompatActivity {
 
     private EditText userEmail;
+    private EditText userTitle;
     private Button btnInviteUser;
     private Button inviteUser;
     private CheckBox adminBox;
@@ -89,11 +90,13 @@ public class ClubSettingsActivity extends AppCompatActivity {
         isAdmin(user, clubID);
 
         userEmail = (EditText) findViewById(R.id.user_email);
+        userTitle = (EditText) findViewById(R.id.user_title);
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
         inviteUser = (Button) findViewById(R.id.inviteUser);
         adminBox = (CheckBox) findViewById(R.id.adminBox);
 
         userEmail.setVisibility(View.GONE);
+        userTitle.setVisibility(View.GONE);
         inviteUser.setVisibility(View.GONE);
         adminBox.setVisibility(View.GONE);
 
@@ -108,6 +111,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 userEmail.setVisibility(View.VISIBLE);
+                userTitle.setVisibility(View.VISIBLE);
                 inviteUser.setVisibility(View.VISIBLE);
                 adminBox.setVisibility(View.VISIBLE);
             }
@@ -120,6 +124,11 @@ public class ClubSettingsActivity extends AppCompatActivity {
                 String email = userEmail.getText().toString().trim();
                 // check if admin status is checked.
                 final boolean adminStatus = adminBox.isChecked();
+
+                //get title
+                //String title = userTitle.getText().toString().trim();
+                //System.out.println("THE USER TITLE = " + title);
+
 
                 if (isAdmin(user, clubID) && !email.equals("")) {
                     mDatabaseReference.child("users").orderByChild("email").equalTo(email)
@@ -137,7 +146,19 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         // successful invite send
                                         String uid = dataSnapshot.getChildren().iterator().next().getKey();
                                         // Update user's invited to list
-                                        mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).setValue(adminStatus);
+                                        mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
+
+                                        String title = userTitle.getText().toString().trim();
+                                        System.out.println("USER TITLE = " + title);
+
+                                        if(title.isEmpty()){
+                                            System.out.println("using default");
+                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
+                                        } else {
+                                            System.out.println("using: " + title);
+                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
+                                        }
+
 
                                         Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);

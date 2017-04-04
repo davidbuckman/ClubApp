@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                      public void onDataChange(DataSnapshot dataSnapshot) {
                          Log.d("location testing", "in main");
 //                         System.out.println("CHANGES!!!! : " + dataSnapshot.child("name").getValue(String.class));
-                         System.out.println("CHANGES!!!! : " + dataSnapshot.getKey());
+                         System.out.println("making card for: " + dataSnapshot.getKey());
                          String name = dataSnapshot.getKey().toString();
                          String about = dataSnapshot.child("about").getValue(String.class);
                          viewHolder.clubName.setText(name);
