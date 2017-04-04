@@ -34,6 +34,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
     private Button btnInviteUser;
     private Button inviteUser;
     private Button leaveGroup;
+    private Button deleteGroup;
     private CheckBox adminBox;
     private boolean adminAuth = false;
 
@@ -95,6 +96,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
         inviteUser = (Button) findViewById(R.id.inviteUser);
         leaveGroup = (Button) findViewById(R.id.leave_club_button);
+        deleteGroup = (Button) findViewById(R.id.delete_club_button);
         adminBox = (CheckBox) findViewById(R.id.adminBox);
 
         userEmail.setVisibility(View.GONE);
@@ -206,6 +208,32 @@ public class ClubSettingsActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        if (adminAuth) {
+            deleteGroup.setVisibility(View.VISIBLE);
+            deleteGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mDatabaseReference.child("clubs").child(clubID).child("members")
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot member : dataSnapshot.getChildren()) {
+                                        String memberID = member.getKey();
+                                        mDatabaseReference.child("users").child(memberID).child("clubs").child(clubID).removeValue();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                }
+                            });
+                    mDatabaseReference.child("clubs").child(clubID).removeValue();
+                }
+            });
+
+        }
+
     }
   
   // I got rid of isAdmin due to asynchronousness making it too complicated and just built the
