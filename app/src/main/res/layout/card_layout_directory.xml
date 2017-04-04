@@ -8,13 +8,13 @@
     <!-- A CardView that contains a TextView -->
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:layout_margin="5dp"
-        card_view:cardElevation="5dp"
+        card_view:cardBackgroundColor="#FFFFFF"
         card_view:cardCornerRadius="2dp"
-        card_view:cardBackgroundColor="#FFFFFF">
+        card_view:cardElevation="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,43 +25,57 @@
                 android:id="@+id/user_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_gravity="start"
                 android:gravity="left"
                 android:paddingLeft="20dp"
-                android:textSize="30sp"
-                android:textStyle="normal"
-                android:text="User Name"
-                android:layout_gravity="start"
                 android:paddingTop="20dp"
-                android:textColor="#000000" />
+                android:text="User Name"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                android:textStyle="normal" />
 
             <TextView
-                android:text="User Position"
+                android:id="@+id/user_position"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/user_position"
+                android:paddingBottom="5dp"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
-                android:textSize="18sp"
-                android:paddingBottom="5dp"
-                android:textColor="#000000" />
+                android:text="User Position"
+                android:textColor="#000000"
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:id="@+id/LinearLayout02"
-                android:layout_height="wrap_content"
                 android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true">
+
                 <Button
                     android:id="@+id/write_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="Send Email"
                     android:layout_gravity="start"
-                    android:textAlignment="textStart"
+                    android:layout_weight="1"
                     android:background="#FFFFFF"
                     android:paddingLeft="20dp"
+                    android:text="Send Email"
+                    android:textAlignment="textStart"
                     android:textColor="#F79E21"
-                    android:textStyle="normal|bold">
-                </Button>
+                    android:textStyle="normal|bold"></Button>
+
+                <Button
+                    android:id="@+id/edit_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:background="#FFFFFF"
+                    android:paddingLeft="20dp"
+                    android:text="Edit User"
+                    android:textAlignment="textStart"
+                    android:textColor="#F79E21"
+                    android:textStyle="normal|bold"></Button>
 
             </LinearLayout>
 

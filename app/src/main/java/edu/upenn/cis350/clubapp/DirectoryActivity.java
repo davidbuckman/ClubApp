@@ -1,6 +1,7 @@
 package edu.upenn.cis350.clubapp;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
@@ -38,8 +39,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeMap;
+
+import static android.R.attr.value;
 
 public class DirectoryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,12 +52,15 @@ public class DirectoryActivity extends AppCompatActivity
 
     //global list
     HashMap<String, ClubMember> membersMap;
+    HashMap<String, User> usersMap;
 
+    private static Context mContext;
 
     //set up for recycler view
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
 
     //Getting reference to Firebase Database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -60,11 +68,19 @@ public class DirectoryActivity extends AppCompatActivity
 
     //firebase auth for user id
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    // get if current user is an administrator
+    boolean currentUserIsAdmin = false;
+
+
 
     String clubID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        mContext = this;
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -98,6 +114,7 @@ public class DirectoryActivity extends AppCompatActivity
                 System.out.println("1-- enter header change");
                 navigationHeaderName.setText(dataSnapshot.child("firstName").getValue() + " " + dataSnapshot.child("lastName").getValue());
                 navigationHeaderEmail.setText(dataSnapshot.child("email").getValue(String.class));
+
             }
 
             @Override
@@ -107,6 +124,7 @@ public class DirectoryActivity extends AppCompatActivity
 
         // Initialize data structures
         membersMap = new HashMap<>(0);
+        usersMap = new HashMap<>(0);
 
         // Determine club name (club ID) via intent extras
         clubID = getIntent().getStringExtra("CLUB");
@@ -145,6 +163,10 @@ public class DirectoryActivity extends AppCompatActivity
 
                 //get all members for the club
                 for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("members").getChildren()){
+                    if (snapshot.getKey().equals(auth.getCurrentUser().getUid())) {
+                        currentUserIsAdmin = Boolean.parseBoolean(snapshot.child("isAdmin").getValue().toString());
+                    }
+
                     System.out.println("\n id: " + snapshot.getKey());
                     System.out.println("isAdmin = " + snapshot.child("isAdmin").getValue().toString());
                     System.out.println("title = " + snapshot.child("title").getValue().toString());
@@ -160,6 +182,7 @@ public class DirectoryActivity extends AppCompatActivity
                         isAdmin = true;
                     }
                     membersMap.put(snapshot.getKey(), new ClubMember(isAdmin, title));
+
                     System.out.println("added person with title " + title);
                     //membersList.add(new ClubMember(snapshot.getKey(), isAdmin , title));
 
@@ -170,7 +193,9 @@ public class DirectoryActivity extends AppCompatActivity
 
                 //maps from user to their title in the club
                 HashMap<User, String> admins = new HashMap<>();
+                HashMap<User, String> adminsWithUIDs = new HashMap<>();
                 HashMap<User, String> genUsers = new HashMap<>();
+                HashMap<User, String> genUsersWithUIDs = new HashMap<>();
 
 
                 if(membersMap.isEmpty()){
@@ -197,19 +222,24 @@ public class DirectoryActivity extends AppCompatActivity
                             System.out.println(userSnap.child("firstName").getValue());
                             if(membersMap.get(currID).getIsAdmin()){
                                 //add to admin
-                                admins.put(new User(
-                                                userSnap.child("firstName").getValue().toString(),
-                                                userSnap.child("lastName").getValue().toString(),
-                                                userSnap.child("email").getValue().toString()),
+                                User temp = new User(
+                                        userSnap.child("firstName").getValue().toString(),
+                                        userSnap.child("lastName").getValue().toString(),
+                                        userSnap.child("email").getValue().toString());
+                                admins.put(temp,
                                         membersMap.get(currID).getTitle());
+                                adminsWithUIDs.put(temp, currID);
 
                             } else {
                                 //add to genUsers
-                                genUsers.put(new User(
-                                                userSnap.child("firstName").getValue().toString(),
-                                                userSnap.child("lastName").getValue().toString(),
-                                                userSnap.child("email").getValue().toString()),
+                                User temp = new User(
+                                        userSnap.child("firstName").getValue().toString(),
+                                        userSnap.child("lastName").getValue().toString(),
+                                        userSnap.child("email").getValue().toString());
+                                genUsers.put(temp,
                                         membersMap.get(currID).getTitle());
+                                genUsersWithUIDs.put(temp, currID);
+
                             }
                         }
                     }
@@ -230,7 +260,7 @@ public class DirectoryActivity extends AppCompatActivity
                 }
 
 
-                RVAdapter adapter = new RVAdapter(membersMap, admins, genUsers);
+                RVAdapter adapter = new RVAdapter(membersMap, admins, adminsWithUIDs, genUsers, genUsersWithUIDs);
                 mRecyclerView.setAdapter(adapter);
 
 
@@ -282,18 +312,24 @@ public class DirectoryActivity extends AppCompatActivity
 
         HashMap<String,ClubMember> memberList;
 
-        //maps from use to their title in the club
+        //maps from user to their title in the club
         HashMap<User, String> adminMap;
+        HashMap<User, String> adminMapWithUID;
         ArrayList<User> adminList;
         HashMap<User, String> genUserMap;
+        HashMap<User, String> genUserWithUID;
         ArrayList<User> genUserList;
 
-        RVAdapter(HashMap<String, ClubMember> mem, HashMap<User, String> adMap, HashMap<User, String> genMap){
+
+        RVAdapter(HashMap<String, ClubMember> mem, HashMap<User, String> adMap, HashMap<User, String> adminMapWithUID, HashMap<User, String> genMap, HashMap<User, String> genMapWithUID){
             System.out.println("4-- In RVAdapter");
 
             this.memberList = mem;
             this.genUserMap = genMap;
+            this.genUserWithUID = genMapWithUID;
             this.adminMap = adMap;
+            this.adminMapWithUID = adminMapWithUID;
+
             adminList = new ArrayList<>();
             genUserList = new ArrayList<>();
 
@@ -333,6 +369,14 @@ public class DirectoryActivity extends AppCompatActivity
                 holder.user.setText(genUserList.get(position).getFirstName() + " " + genUserList.get(position).getLastName() );
                 holder.position.setText(genUserMap.get(genUserList.get(position)));
                 holder.email = genUserList.get(position).getEmail();
+                for (Map.Entry<User, String> entry : genUserWithUID.entrySet()) {
+
+                    if (entry.getKey().equals(genUserList.get(position))) {
+                        System.out.println("ENTRY IS: " + entry.getValue());
+                        holder.uid = entry.getValue();
+                    }
+                }
+
 
             } else{
                 //need to look at admins
@@ -340,6 +384,14 @@ public class DirectoryActivity extends AppCompatActivity
                 holder.user.setText(adminList.get(position).getFirstName() + " " + adminList.get(position).getLastName() );
                 holder.position.setText(adminMap.get(adminList.get(position)));
                 holder.email = adminList.get(position).getEmail();
+
+                for (Map.Entry<User, String> entry : adminMapWithUID.entrySet()) {
+
+                    if (entry.getKey().equals(adminList.get(position))) {
+                        System.out.println("ENTRY IS: " + entry.getValue());
+                        holder.uid = entry.getValue();
+                    }
+                }
 
             }
 
@@ -360,14 +412,30 @@ public class DirectoryActivity extends AppCompatActivity
 
             //String userId;
             String email;
+            String uid;
             TextView user;
             TextView position;
+            Button editUser;
             Button emailLink;
 
             public DirectoryViewHolder(View v) {
                 super(v);
                 user = (TextView) v.findViewById(R.id.user_name);
                 position = (TextView) v.findViewById(R.id.user_position);
+                System.out.println("ADMIN IS: " + currentUserIsAdmin);
+                editUser = (Button) v.findViewById(R.id.edit_user);
+                if (currentUserIsAdmin) {
+                    editUser.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            final Intent intent = new Intent(mContext, EditClubUserActivity.class);
+                            intent.putExtra("CLUB", clubID);
+                            intent.putExtra("USER", uid);
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    editUser.setVisibility(View.GONE);
+                }
                 emailLink = (Button) v.findViewById(R.id.write_email);
                 emailLink.setOnClickListener(new View.OnClickListener() {
                     @Override

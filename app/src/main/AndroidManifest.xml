@@ -17,9 +17,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:excludeFromRecents="true"
             android:noHistory="true"
-            android:excludeFromRecents="true">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -61,15 +61,18 @@
         <activity
             android:name=".DirectoryActivity"
             android:label="ClubDirectory"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CalendarActivity"
             android:label="CalendarActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".CalendarEventActivity"
+        <activity
+            android:name=".CalendarEventActivity"
             android:label="CalendarEventActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity android:name=".EditClubUserActivity"
+            android:label="CalendarEventActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
