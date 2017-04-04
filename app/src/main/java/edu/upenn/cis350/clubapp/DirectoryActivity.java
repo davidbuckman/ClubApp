@@ -216,12 +216,15 @@ public class DirectoryActivity extends AppCompatActivity
                 mDatabaseReference.child("clubs").child(clubID).child("members").child(auth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.child("isAdmin").getValue(Boolean.class)) {
-                            viewHolder.editUser.setVisibility(View.GONE);
-                        } else {
-                            viewHolder.editUser.setVisibility(View.VISIBLE);
+                        if (dataSnapshot.exists()) {
+                            if (!dataSnapshot.child("isAdmin").getValue(Boolean.class)) {
+                                viewHolder.editUser.setVisibility(View.GONE);
+                            } else {
+                                viewHolder.editUser.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
+
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
