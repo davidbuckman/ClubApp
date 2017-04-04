@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,7 +45,9 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
+import static android.R.attr.data;
 import static android.R.attr.value;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 public class DirectoryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -75,6 +78,34 @@ public class DirectoryActivity extends AppCompatActivity
 
     String clubID;
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+// Handle navigation view item clicks here.
+        Intent i = new Intent();
+        i.putExtra("CLUB", clubID);
+
+        int id = item.getItemId();
+        if (id == R.id.nav_information) {
+
+        } else if (id == R.id.nav_announcements) {
+            i.setClass(this, AnnouncementsActivity.class);
+
+        } else if (id == R.id.nav_calendar) {
+
+        } else if (id == R.id.nav_directory) {
+            i.setClass(this, DirectoryActivity.class);
+
+        } else if (id == R.id.nav_club_settings) {
+            i.setClass(this, ClubSettingsActivity.class);
+        }
+
+        startActivity(i);
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,116 +184,14 @@ public class DirectoryActivity extends AppCompatActivity
         DatabaseReference ref = mDatabaseReference;
 
 
-         //maintains the user lists for the club
-        ref.addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child("clubs").child(clubID).child("members").child(auth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                membersMap = new HashMap<String, ClubMember>();
-                System.out.println("2-- Num snapshot members = " + dataSnapshot.getChildrenCount());
-
-
-                //get all members for the club
-                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("members").getChildren()){
-                    if (snapshot.getKey().equals(auth.getCurrentUser().getUid())) {
-                        currentUserIsAdmin = Boolean.parseBoolean(snapshot.child("isAdmin").getValue().toString());
-                    }
-
-                    System.out.println("\n id: " + snapshot.getKey());
-                    System.out.println("isAdmin = " + snapshot.child("isAdmin").getValue().toString());
-                    System.out.println("title = " + snapshot.child("title").getValue().toString());
-                    //TODO(jenna) figure out if this is filled in by default
-                    String title = "";
-                    if (snapshot.child("title").getValue() != null) {
-                        title = snapshot.child("title").getValue().toString();
-                    }
-
-                    //defualt admin permission to false, chnge if its true
-                    boolean isAdmin = false;
-                    if(snapshot.child("isAdmin").getValue().toString().toLowerCase().equals("true")){
-                        isAdmin = true;
-                    }
-                    membersMap.put(snapshot.getKey(), new ClubMember(isAdmin, title));
-
-                    System.out.println("added person with title " + title);
-                    //membersList.add(new ClubMember(snapshot.getKey(), isAdmin , title));
-
-
+                if (dataSnapshot.exists()) {
+                    currentUserIsAdmin = dataSnapshot.child("isAdmin").getValue(Boolean.class);
                 }
-
-
-
-                //maps from user to their title in the club
-                HashMap<User, String> admins = new HashMap<>();
-                HashMap<User, String> adminsWithUIDs = new HashMap<>();
-                HashMap<User, String> genUsers = new HashMap<>();
-                HashMap<User, String> genUsersWithUIDs = new HashMap<>();
-
-
-                if(membersMap.isEmpty()){
-                    // TODO: is this toast ever displayed? lol no
-                    Toast.makeText(DirectoryActivity.this,
-                            "This club has no members!",
-                            Toast.LENGTH_LONG).show();
-                } else{
-                    System.out.println("members map");
-                    for(String key : membersMap.keySet()){
-                        System.out.println(key + ":: "+ membersMap.get(key).getTitle());
-                        System.out.println(key + "::: "+ membersMap.get(key));
-                    }
-
-
-
-                    //get user object for each member and map to id
-                    System.out.println("3-- entered snapshot listener to get users from ids");
-                    System.out.println("num users = " + dataSnapshot.child("users").getChildrenCount());
-
-                    for(DataSnapshot userSnap : dataSnapshot.child("users").getChildren()){
-                        String currID = userSnap.getKey().toString();
-                        if(membersMap.keySet().contains(userSnap.getKey().toString())){
-                            System.out.println(userSnap.child("firstName").getValue());
-                            if(membersMap.get(currID).getIsAdmin()){
-                                //add to admin
-                                User temp = new User(
-                                        userSnap.child("firstName").getValue().toString(),
-                                        userSnap.child("lastName").getValue().toString(),
-                                        userSnap.child("email").getValue().toString());
-                                admins.put(temp,
-                                        membersMap.get(currID).getTitle());
-                                adminsWithUIDs.put(temp, currID);
-
-                            } else {
-                                //add to genUsers
-                                User temp = new User(
-                                        userSnap.child("firstName").getValue().toString(),
-                                        userSnap.child("lastName").getValue().toString(),
-                                        userSnap.child("email").getValue().toString());
-                                genUsers.put(temp,
-                                        membersMap.get(currID).getTitle());
-                                genUsersWithUIDs.put(temp, currID);
-
-                            }
-                        }
-                    }
-
-
-                    System.out.println("The admins: " + admins.size());
-                    for(User temp : admins.keySet()){
-                        System.out.println(temp.getFirstName() + temp.getLastName() + admins.get(temp));
-                    }
-                    System.out.println("The genusers:" + genUsers.size());
-                    for(User temp : genUsers.keySet()){
-                        System.out.println(temp.getFirstName() + temp.getLastName() + genUsers.get(temp));
-                    }
-
-                    System.out.println("admin list size = " + admins.size());
-                    System.out.println("gen list size = " + genUsers.size());
-
-                }
-                adapter = new RVAdapter(membersMap, admins, adminsWithUIDs, genUsers, genUsersWithUIDs);
-                mRecyclerView.setAdapter(adapter);
-
-
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -270,205 +199,123 @@ public class DirectoryActivity extends AppCompatActivity
         });
 
 
+        final FirebaseRecyclerAdapter<ClubMember, ClubMemberViewHolder> adapter = new FirebaseRecyclerAdapter<ClubMember, ClubMemberViewHolder>(
+                ClubMember.class,
+                R.layout.card_layout_directory,
+                ClubMemberViewHolder.class,
+                ref.child("clubs").child(clubID).child("members").orderByChild("isAdmin").getRef()
+        ) {
+            @Override
+            protected void populateViewHolder(final ClubMemberViewHolder viewHolder, final ClubMember model, int position) {
+                // key is UID
+                final String key = this.getRef(position).getKey();
+                final String title = model.getTitle();
 
+                System.out.println("CURRENT USER IS " + currentUserIsAdmin + " admin");
 
-    }
-
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        Intent i = new Intent();
-        i.putExtra("CLUB", clubID);
-
-        int id = item.getItemId();
-        if (id == R.id.nav_information) {
-
-        } else if (id == R.id.nav_announcements) {
-            i.setClass(this, AnnouncementsActivity.class);
-
-        } else if (id == R.id.nav_calendar) {
-
-        } else if (id == R.id.nav_directory) {
-            i.setClass(this, DirectoryActivity.class);
-
-        } else if (id == R.id.nav_club_settings) {
-            i.setClass(this, ClubSettingsActivity.class);
-        }
-
-        startActivity(i);
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-
-    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.DirectoryViewHolder>{
-
-        HashMap<String,ClubMember> memberList;
-
-        //maps from user to their title in the club
-        HashMap<User, String> adminMap;
-        HashMap<User, String> adminMapWithUID;
-        ArrayList<User> adminList;
-        HashMap<User, String> genUserMap;
-        HashMap<User, String> genUserWithUID;
-        ArrayList<User> genUserList;
-
-
-        RVAdapter(HashMap<String, ClubMember> mem, HashMap<User, String> adMap, HashMap<User, String> adminMapWithUID, HashMap<User, String> genMap, HashMap<User, String> genMapWithUID){
-            System.out.println("4-- In RVAdapter");
-
-            this.memberList = mem;
-            this.genUserMap = genMap;
-            this.genUserWithUID = genMapWithUID;
-            this.adminMap = adMap;
-            this.adminMapWithUID = adminMapWithUID;
-
-            adminList = new ArrayList<>();
-            genUserList = new ArrayList<>();
-
-            //fill arraylist of admins
-            for(User temp : adminMap.keySet()){
-                adminList.add(temp);
-            }
-            //fill arraylist of general users
-            for(User temp : genUserMap.keySet()){
-                genUserList.add(temp);
-            }
-            //sort
-            Collections.sort(adminList);
-            Collections.sort(genUserList);
-
-
-            System.out.println("rv admin list size = " + adminList.size());
-            System.out.println("rv gen list size = " + genUserList.size());
-
-        }
-
-        @Override
-        public RVAdapter.DirectoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_layout_directory, parent, false);
-            RVAdapter.DirectoryViewHolder dvh = new RVAdapter.DirectoryViewHolder(v);
-            return dvh;
-        }
-
-        @Override
-        public void onBindViewHolder(RVAdapter.DirectoryViewHolder holder, int position) {
-            System.out.println("binding holder: " + position);
-            System.out.println("adminlist size = " + adminList.size());
-            if(position >= adminList.size()){
-                //need to look at gen users
-                position = position - adminList.size();
-                System.out.println("posting gen user for index " + position);
-                holder.user.setText(genUserList.get(position).getFirstName() + " " + genUserList.get(position).getLastName() );
-                holder.position.setText(genUserMap.get(genUserList.get(position)));
-                holder.email = genUserList.get(position).getEmail();
-                for (Map.Entry<User, String> entry : genUserWithUID.entrySet()) {
-
-                    if (entry.getKey().equals(genUserList.get(position))) {
-                        System.out.println("ENTRY IS: " + entry.getValue());
-                        holder.uid = entry.getValue();
-                    }
-                }
-
-
-            } else{
-                //need to look at admins
-                System.out.println("posting admin for index " + position);
-                holder.user.setText(adminList.get(position).getFirstName() + " " + adminList.get(position).getLastName() );
-                holder.position.setText(adminMap.get(adminList.get(position)));
-                holder.email = adminList.get(position).getEmail();
-
-                for (Map.Entry<User, String> entry : adminMapWithUID.entrySet()) {
-
-                    if (entry.getKey().equals(adminList.get(position))) {
-                        System.out.println("ENTRY IS: " + entry.getValue());
-                        holder.uid = entry.getValue();
-                    }
-                }
-
-            }
-
-        }
-
-
-        @Override
-        public int getItemCount() {
-            return memberList.size();
-        }
-
-        @Override
-        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-            super.onAttachedToRecyclerView(recyclerView);
-        }
-
-        //ViewHolder for our Firebase UI
-        public class DirectoryViewHolder extends RecyclerView.ViewHolder{
-
-            //String userId;
-            String email;
-            String uid;
-            TextView user;
-            TextView position;
-            Button editUser;
-            Button emailLink;
-
-            public DirectoryViewHolder(View v) {
-                super(v);
-                user = (TextView) v.findViewById(R.id.user_name);
-                position = (TextView) v.findViewById(R.id.user_position);
-                System.out.println("ADMIN IS: " + currentUserIsAdmin);
-                editUser = (Button) v.findViewById(R.id.edit_user);
-                if (currentUserIsAdmin) {
-                    editUser.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            final Intent intent = new Intent(mContext, EditClubUserActivity.class);
-                            intent.putExtra("CLUB", clubID);
-                            intent.putExtra("USER", uid);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-                } else {
-                    editUser.setVisibility(View.GONE);
-                }
-                emailLink = (Button) v.findViewById(R.id.write_email);
-                emailLink.setOnClickListener(new View.OnClickListener() {
+                mDatabaseReference.child("clubs").child(clubID).child("members").child(auth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onClick(View v) {
-                        Log.d("MainActivity", "Click to email " + user.getText());
-
-                        if(email.isEmpty()){
-                            Toast.makeText(DirectoryActivity.this,
-                                "No email available! Sorry!",
-                                Toast.LENGTH_LONG).show();
-                        } else{
-                            String emailTo = "mailto:" + email;
-                            System.out.println("sending email to emailTo");
-
-                            /* Create the Intent */
-                            final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-
-                            /* Fill it with Data */
-                            emailIntent.setType("plain/text");
-                            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{email});
-                            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject");
-                            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Text");
-
-                            /* Send it off to the Activity-Chooser */
-                            startActivity(Intent.createChooser(emailIntent, "Sending mail to: " + email));
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.child("isAdmin").getValue(Boolean.class)) {
+                            viewHolder.editUser.setVisibility(View.GONE);
+                        } else {
+                            viewHolder.editUser.setVisibility(View.VISIBLE);
                         }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
 
+                mDatabaseReference.child("users").child(key).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String fname = dataSnapshot.child("firstName").getValue(String.class);
+                        String lname = dataSnapshot.child("lastName").getValue(String.class);
+                        String name = fname + " " + lname;
+                        System.out.println("NAME IS: " + name);
+
+                        String email = dataSnapshot.child("email").getValue(String.class);
 
 
+
+                        viewHolder.clubID = clubID;
+
+                        viewHolder.user.setText(name);
+                        viewHolder.email = email;
+                        viewHolder.position.setText(title);
+                        viewHolder.uid = key;
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
+        };
+
+        mRecyclerView.setAdapter(adapter);
+
+    }
+    public static class ClubMemberViewHolder extends RecyclerView.ViewHolder {
+        String email;
+        String uid;
+        TextView user;
+        TextView position;
+        Button editUser;
+        Button emailLink;
+        String clubID;
+
+        public ClubMemberViewHolder(View v) {
+            super(v);
+            emailLink = (Button) v.findViewById(R.id.write_email);
+            editUser = (Button) v.findViewById(R.id.edit_user);
+            user = (TextView) v.findViewById(R.id.user_name);
+            position = (TextView) v.findViewById(R.id.user_position);
+
+
+            editUser.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    final Intent intent = new Intent(mContext, EditClubUserActivity.class);
+                    intent.putExtra("CLUB", clubID);
+                    intent.putExtra("USER", uid);
+                    mContext.startActivity(intent);
+                }
+            });
+
+
+            emailLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("MainActivity", "Click to email " + user.getText());
+
+                    if(email.isEmpty()){
+                        Toast.makeText(mContext,
+                                "No email available! Sorry!",
+                                Toast.LENGTH_LONG).show();
+                    } else{
+                        String emailTo = "mailto:" + email;
+                        System.out.println("sending email to emailTo");
+
+                /* Create the Intent */
+                        final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+                /* Fill it with Data */
+                        emailIntent.setType("plain/text");
+                        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{email});
+                        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject");
+                        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Text");
+
+                /* Send it off to the Activity-Chooser */
+                        mContext.startActivity(Intent.createChooser(emailIntent, "Sending mail to: " + email));
+                    }
+
+                }
+            });
         }
     }
 }
