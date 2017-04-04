@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -60,8 +61,18 @@ public class AnnouncementsActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Determine club name (club ID) via intent extras
+        clubID = getIntent().getStringExtra("CLUB");
+        System.out.println("\nclub name in act =  " + clubID);
 
+        // If club name is null, send back to main page
+        if (clubID == null){
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+            finish();
+        }
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -70,9 +81,10 @@ public class AnnouncementsActivity extends AppCompatActivity
                         if (isAdmin) {
                             fab.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick(View view) {
-                                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                                            .setAction("Action", null).show();
+                                public void onClick(View v) {
+                                    Intent i = new Intent(AnnouncementsActivity.this, AddAnnouncementActivity.class);
+                                    i.putExtra("CLUB", clubID);
+                                    startActivity(i);
                                 }
                             });
                         } else {
@@ -114,16 +126,6 @@ public class AnnouncementsActivity extends AppCompatActivity
         clubChannels = new HashSet<String>();
         myChannels = new HashSet<String>();
         messages = new HashSet<ClubNotification>();
-
-        // Determine club name (club ID) via intent extras
-        clubID = getIntent().getStringExtra("CLUB");
-        System.out.println("\nclub name in act =  " + clubID);
-
-        // If club name is null, send back to main page
-        if (clubID == null){
-            Intent i = new Intent(this, MainActivity.class);
-            startActivity(i);
-        }
 
         //set up for display
         mRecyclerView = (RecyclerView) findViewById(R.id.notification_recycler_view);
@@ -174,9 +176,9 @@ public class AnnouncementsActivity extends AppCompatActivity
                 final Iterator<String> myIter = myChannels.iterator();
                 System.out.println("we have iter? " + myIter.hasNext());
                 if(!myIter.hasNext()){
-                    Toast.makeText(AnnouncementsActivity.this,
-                            "You have no new messages!",
-                            Toast.LENGTH_LONG).show();
+                    // Toast.makeText(AnnouncementsActivity.this,
+                    //        "You have no new messages!",
+                    //        Toast.LENGTH_LONG).show();
                 }
                 while (myIter.hasNext()){
                     String channel = myIter.next();
@@ -192,6 +194,16 @@ public class AnnouncementsActivity extends AppCompatActivity
 
                 }
 
+                // David's announcement viewing, potentiall temporary
+                DataSnapshot announcements = dataSnapshot.child("clubs").child(clubID).child("announcements");
+                for (DataSnapshot announcement : announcements.getChildren()) {
+                    ClubNotification notification = new ClubNotification(
+                            announcement.child("body").getValue(String.class),
+                            "General",
+                            announcement.child("title").getValue(String.class),
+                            Long.parseLong(announcement.getKey()));
+                    messages.add(notification);
+                }
 
                 RVAdapter adapter = new RVAdapter(messages);
                 mRecyclerView.setAdapter(adapter);
@@ -236,7 +248,6 @@ public class AnnouncementsActivity extends AppCompatActivity
 
         startActivity(i);
         finish();
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
