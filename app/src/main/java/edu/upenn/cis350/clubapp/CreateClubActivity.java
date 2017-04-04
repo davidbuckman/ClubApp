@@ -98,7 +98,7 @@ public class CreateClubActivity extends AppCompatActivity {
                 //create
                 Toast.makeText(getApplicationContext(), "Your club was made!", Toast.LENGTH_SHORT).show();
 
-                Club newClub = new Club(name, about, auth.getCurrentUser().getUid());
+                Club newClub = new Club(name, about, auth.getCurrentUser().getUid(), true);
                 newClub.setChannels(channels);
 
                 //add to database

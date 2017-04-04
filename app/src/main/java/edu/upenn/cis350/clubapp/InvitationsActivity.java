@@ -92,7 +92,8 @@ public class InvitationsActivity extends AppCompatActivity {
                         mDatabaseReference.child("clubs").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.d("InvitationsActivity", dataSnapshot.child("name").getValue(String.class));
+                                //TODO: invitation doesn't contain name - removing "null pointer" causes error
+                                Log.d("InvitationsActivity", "null pointer:" + dataSnapshot.child("name").getValue(String.class));
                                 String name = dataSnapshot.child("name").getValue(String.class);
                                 String about = dataSnapshot.child("about").getValue(String.class);
                                 viewHolder.clubName.setText(name);
@@ -130,8 +131,6 @@ public class InvitationsActivity extends AppCompatActivity {
         DatabaseReference userInClub = mDatabaseReference.child("clubs").child(clubID).child("members").child(userID);
         userInClub.child("isAdmin").setValue(adminStatus);
         userInClub.child("title").setValue("General Memeber");
-        userInClub.child("unreadNotifs").setValue(0);
-
 
         Log.d("InvitationsActivity", "Accepting invitation to " + clubID);
     }

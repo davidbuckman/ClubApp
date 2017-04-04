@@ -5,18 +5,17 @@ package edu.upenn.cis350.clubapp;
  */
 
 public class ClubMember implements Comparable{
+    //allows for additional capabilities for managing club
     public boolean isAdmin;
+    //role in club
     public String title;
-    public String name;
-    public String userId;
-    public int unreadNotifs;
+
 
     public ClubMember() {
     }
 
-    public ClubMember(String name, String id, boolean isAdmin, String title) {
-        this.name = name;
-        this.userId = id;
+    public ClubMember(boolean isAdmin, String title) {
+
         this.isAdmin = isAdmin;
         this.title = title;
     }
@@ -29,12 +28,6 @@ public class ClubMember implements Comparable{
         return this.isAdmin ? this.title : "General Member";
     }
 
-    public String getName() {  return this.name; }
-
-    public String getUserId() { return this.userId; }
-
-    public void setName(String nm) { this.name = nm; }
-
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
@@ -43,19 +36,9 @@ public class ClubMember implements Comparable{
         this.title = title;
     }
 
-    public int addUnreadNotification() {
-        this.unreadNotifs++;
-        return this.unreadNotifs;
-    }
-
-    public void resetUnreadNotifcations() {
-        this.unreadNotifs = 0;
-    }
-
     @Override
     public int compareTo(Object o) {
         ClubMember other = (ClubMember) o;
-
 
         if(this.getIsAdmin() == true && other.getIsAdmin() == false){
             return -1;
@@ -63,11 +46,8 @@ public class ClubMember implements Comparable{
             return 1;
         } else{
             //both admin or both general users
-            this.getName().compareTo(other.getName());
+            this.title.compareTo(other.title);
         }
-
-
-
         return 0;
     }
 }

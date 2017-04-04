@@ -33,6 +33,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
     private Button btnInviteUser;
     private Button inviteUser;
     private CheckBox adminBox;
+    private boolean adminAuth = false;
 
     private ProgressBar progressBar;
     private FirebaseAuth.AuthStateListener authListener;
@@ -83,6 +84,9 @@ public class ClubSettingsActivity extends AppCompatActivity {
                 }
             }
         };
+
+        // update admin status
+        isAdmin(user, clubID);
 
         userEmail = (EditText) findViewById(R.id.user_email);
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
@@ -159,9 +163,32 @@ public class ClubSettingsActivity extends AppCompatActivity {
 
     }
 
-    public boolean isAdmin(FirebaseUser user, String clubID) {
+    public boolean isAdmin(final FirebaseUser user, final String clubID) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference mDatabaseReference = database.getReference();
+        //get data and display
+        DatabaseReference ref = mDatabaseReference;
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            //mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("auth", "old adminAuth:" + adminAuth);
+                //get all members for the club
+                adminAuth = (boolean) dataSnapshot.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin").getValue();
+                Log.d("auth", "new adminAuth:" + adminAuth);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
         // TODO
-        return true;
+        return adminAuth;
     }
 
     @Override
