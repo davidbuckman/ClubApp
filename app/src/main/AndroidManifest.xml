@@ -56,7 +56,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AnnouncementsActivity"
-            android:label="@string/title_activity_announcements2"
+            android:label="@string/title_activity_announcements"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AddAnnouncementActivity"
+            android:label="@string/title_activity_add_announcement"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".DirectoryActivity"

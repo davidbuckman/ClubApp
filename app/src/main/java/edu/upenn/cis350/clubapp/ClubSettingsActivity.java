@@ -33,6 +33,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
     private EditText userTitle;
     private Button btnInviteUser;
     private Button inviteUser;
+    private Button leaveGroup;
     private CheckBox adminBox;
     private boolean adminAuth = false;
 
@@ -93,6 +94,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
         userTitle = (EditText) findViewById(R.id.user_title);
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
         inviteUser = (Button) findViewById(R.id.inviteUser);
+        leaveGroup = (Button) findViewById(R.id.leave_club_button);
         adminBox = (CheckBox) findViewById(R.id.adminBox);
 
         userEmail.setVisibility(View.GONE);
@@ -122,6 +124,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email = userEmail.getText().toString().trim();
+
                 // check if admin status is checked.
                 final boolean adminStatus = adminBox.isChecked();
 
@@ -130,7 +133,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
                 //System.out.println("THE USER TITLE = " + title);
 
 
-                if (isAdmin(user, clubID) && !email.equals("")) {
+                if (!email.equals("")) {
                     mDatabaseReference.child("users").orderByChild("email").equalTo(email)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -143,31 +146,39 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         Toast.makeText(ClubSettingsActivity.this, "There is no user with that email!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
-                                        // check to see if the user invited is the current user
-                                        String uid = dataSnapshot.getChildren().iterator().next().getKey();
-                                        if (uid.equals(auth.getCurrentUser().getUid())) {
-                                            Log.e("ClubSettingsActivity", "Invited User is Admin");
-                                            Toast.makeText(ClubSettingsActivity.this, "You cannot invite yourself!", Toast.LENGTH_LONG).show();
-                                            progressBar.setVisibility(View.GONE);
-                                        } else {
-                                            // Update user's invited to list
-                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
 
-                                            String title = userTitle.getText().toString().trim();
-                                            System.out.println("USER TITLE = " + title);
+                                        final String inviteeUid = dataSnapshot.getChildren().iterator().next().getKey();
+                                        mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin")
+                                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        boolean isAdmin = (boolean) dataSnapshot.getValue();
+                                                        if (isAdmin) {
+                                                            // Update user's invited to list
+                                                            mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
 
-                                            if (title.isEmpty()) {
-                                                System.out.println("using default");
-                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
-                                            } else {
-                                                System.out.println("using: " + title);
-                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
-                                            }
+                                                            String title = userTitle.getText().toString().trim();
+                                                            System.out.println("USER TITLE = " + title);
 
+                                                            if(title.isEmpty()){
+                                                                System.out.println("using default");
+                                                                mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).child("title").setValue("General Member");
+                                                            } else {
+                                                                System.out.println("using: " + title);
+                                                                mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).child("title").setValue(title);
+                                                            }
+                                                            Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
+                                                            progressBar.setVisibility(View.GONE);
+                                                        } else {
+                                                            Toast.makeText(ClubSettingsActivity.this, "Only admins can invite users!", Toast.LENGTH_SHORT).show();
+                                                            progressBar.setVisibility(View.GONE);
+                                                        }
+                                                    }
 
-                                            Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
-                                            progressBar.setVisibility(View.GONE);
-                                        }
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                    }
+                                                });
                                     }
                                 }
 
@@ -176,9 +187,6 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                 }
                             });
 
-                } else if (!isAdmin(user, clubID)) {
-                    Toast.makeText(ClubSettingsActivity.this, "Only admins can invite users!", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
                 } else if (email.equals("")) {
                     userEmail.setError("Enter an email");
                     progressBar.setVisibility(View.GONE);
@@ -188,7 +196,20 @@ public class ClubSettingsActivity extends AppCompatActivity {
             }
         });
 
+        leaveGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDatabaseReference.child("users").child(user.getUid()).child("clubs").child(clubID).removeValue();
+                mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).removeValue();
+                Intent intent = new Intent(ClubSettingsActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
+  
+  // I got rid of isAdmin due to asynchronousness making it too complicated and just built the
+  // admin check into the function itself. Leaving your todo but currently this function is useless -dcb
 
     public boolean isAdmin(final FirebaseUser user, final String clubID) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();

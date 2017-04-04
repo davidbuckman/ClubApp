@@ -84,6 +84,15 @@
             android:text="@string/invite_user"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/leave_club_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/leave_club"
+            android:textStyle="bold" />
+
+
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
