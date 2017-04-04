@@ -25,7 +25,7 @@ public class ClubMember implements Comparable{
     }
 
     public String getTitle() {
-        return this.isAdmin ? this.title : "General Member";
+        return this.title;
     }
 
     public void setIsAdmin(boolean isAdmin) {

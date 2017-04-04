@@ -43,7 +43,7 @@ public class InvitationsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     static boolean adminStatus = false;
-    static String title = "";
+    static String title;
 
 
     //Getting reference to Firebase Database
@@ -116,13 +116,23 @@ public class InvitationsActivity extends AppCompatActivity {
     }
 
     protected static void acceptInvitation(String clubID) {
+        final String idForClub = clubID;
         DatabaseReference user  = mDatabaseReference.child("users").child(userID);
         // get boolean for admin status
         user.child("invitations").child(clubID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("updating values for admin and title");
+                System.out.println("admin " + dataSnapshot.child("isAdmin").getValue());
+                System.out.println("title " + dataSnapshot.child("title").getValue().toString());
                 adminStatus = (boolean) dataSnapshot.child("isAdmin").getValue();
                 title = dataSnapshot.child("title").getValue().toString();
+
+                //put user in  club
+                DatabaseReference userInClub = mDatabaseReference.child("clubs").child(idForClub).child("members").child(userID);
+                userInClub.child("isAdmin").setValue(adminStatus);
+                System.out.println("Title = " + title);
+                userInClub.child("title").setValue(title);
             }
 
             @Override
@@ -134,11 +144,6 @@ public class InvitationsActivity extends AppCompatActivity {
         user.child("clubs").child(clubID).setValue(true);
         user.child("invitations").child(clubID).removeValue();
         System.out.println("accepted invite to " + clubID);
-
-
-        DatabaseReference userInClub = mDatabaseReference.child("clubs").child(clubID).child("members").child(userID);
-        userInClub.child("isAdmin").setValue(adminStatus);
-        userInClub.child("title").setValue(title);
 
         Log.d("InvitationsActivity", "Accepting invitation to " + clubID);
     }

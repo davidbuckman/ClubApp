@@ -160,6 +160,7 @@ public class DirectoryActivity extends AppCompatActivity
                         isAdmin = true;
                     }
                     membersMap.put(snapshot.getKey(), new ClubMember(isAdmin, title));
+                    System.out.println("added person with title " + title);
                     //membersList.add(new ClubMember(snapshot.getKey(), isAdmin , title));
 
                 }
@@ -172,14 +173,15 @@ public class DirectoryActivity extends AppCompatActivity
 
 
                 if(membersMap.isEmpty()){
-                    // TODO: is this toast ever displayed?
+                    // TODO: is this toast ever displayed? lol no
                     Toast.makeText(DirectoryActivity.this,
                             "This club has no members!",
                             Toast.LENGTH_LONG).show();
                 } else{
                     System.out.println("members map");
                     for(String key : membersMap.keySet()){
-                        System.out.println(key + ": "+ membersMap.get(key).getTitle());
+                        System.out.println(key + ":: "+ membersMap.get(key).getTitle());
+                        System.out.println(key + "::: "+ membersMap.get(key));
                     }
 
 

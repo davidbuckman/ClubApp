@@ -126,7 +126,8 @@ public class ClubSettingsActivity extends AppCompatActivity {
                 final boolean adminStatus = adminBox.isChecked();
 
                 //get title
-                final String title = userTitle.getText().toString().trim();
+                //String title = userTitle.getText().toString().trim();
+                //System.out.println("THE USER TITLE = " + title);
 
 
                 if (isAdmin(user, clubID) && !email.equals("")) {
@@ -147,9 +148,14 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         // Update user's invited to list
                                         mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
 
+                                        String title = userTitle.getText().toString().trim();
+                                        System.out.println("USER TITLE = " + title);
+
                                         if(title.isEmpty()){
+                                            System.out.println("using default");
                                             mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
                                         } else {
+                                            System.out.println("using: " + title);
                                             mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
                                         }
 
