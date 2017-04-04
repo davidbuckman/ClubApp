@@ -162,6 +162,7 @@ public class DirectoryActivity extends AppCompatActivity
                     membersMap.put(snapshot.getKey(), new ClubMember(isAdmin, title));
                     //membersList.add(new ClubMember(snapshot.getKey(), isAdmin , title));
 
+
                 }
 
 
