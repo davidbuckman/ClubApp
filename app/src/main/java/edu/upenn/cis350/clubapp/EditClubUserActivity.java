@@ -91,7 +91,9 @@ public class EditClubUserActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 adminBox.setChecked(Boolean.parseBoolean(dataSnapshot.child("isAdmin").getValue().toString()));
+
                                 userTitle.setText(dataSnapshot.child("title").getValue().toString());
+
                             }
 
                             @Override
@@ -105,9 +107,13 @@ public class EditClubUserActivity extends AppCompatActivity {
         removeUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDatabaseReference.child("clubs").child(clubID).child("members").child(userID).removeValue();
-                mDatabaseReference.child("users").child(userID).child("clubs").child(clubID).removeValue();
-                Toast.makeText(EditClubUserActivity.this, "removed user", Toast.LENGTH_LONG).show();
+                if (!auth.getCurrentUser().getUid().equals(userID)) {
+                    mDatabaseReference.child("clubs").child(clubID).child("members").child(userID).removeValue();
+                    mDatabaseReference.child("users").child(userID).child("clubs").child(clubID).removeValue();
+                    Toast.makeText(EditClubUserActivity.this, "removed user", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(EditClubUserActivity.this, "Cannot remove yourself!", Toast.LENGTH_LONG).show();
+                }
             }
         });
         editUser.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +143,11 @@ public class EditClubUserActivity extends AppCompatActivity {
                                     mDatabaseReference.child("clubs").child(clubID).child("members").child(userID).child("title").setValue(title);
                                 }
 
+
+                                if (auth.getCurrentUser().getUid().equals(userID) && !adminStatus) {
+                                    Toast.makeText(EditClubUserActivity.this, "You are no longer an admin!", Toast.LENGTH_LONG).show();
+                                    finish();
+                                }
 
                                 Toast.makeText(EditClubUserActivity.this, "User has been edited!", Toast.LENGTH_LONG).show();
                                 progressBar.setVisibility(View.GONE);
