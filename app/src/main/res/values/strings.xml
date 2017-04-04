@@ -59,6 +59,7 @@
     <string name="hint_invite_user">Email</string>
     <string name="btn_invite">Invite</string>
     <string name="leave_club">Leave Club</string>
+    <string name="delete_club">Delete Club</string>
 
     <string-array name="navigation_options">
         <item>Information</item>
