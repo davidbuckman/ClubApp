@@ -209,31 +209,31 @@ public class ClubSettingsActivity extends AppCompatActivity {
             }
         });
 
-        if (adminAuth) {
-            deleteGroup.setVisibility(View.VISIBLE);
-            deleteGroup.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mDatabaseReference.child("clubs").child(clubID).child("members")
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabaseReference.child("clubs").child(clubID).child("members")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                        boolean isAdmin = dataSnapshot.child(user.getUid()).child("isAdmin").getValue(Boolean.class);
+                        if (isAdmin) {
+                            deleteGroup.setVisibility(View.VISIBLE);
+                            deleteGroup.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                public void onClick(View v) {
                                     for (DataSnapshot member : dataSnapshot.getChildren()) {
                                         String memberID = member.getKey();
                                         mDatabaseReference.child("users").child(memberID).child("clubs").child(clubID).removeValue();
                                     }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                    mDatabaseReference.child("clubs").child(clubID).removeValue();
+                                    finish();
                                 }
                             });
-                    mDatabaseReference.child("clubs").child(clubID).removeValue();
-                }
-            });
+                        }
+                    }
 
-        }
-
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
   
   // I got rid of isAdmin due to asynchronousness making it too complicated and just built the
