@@ -146,6 +146,7 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         Toast.makeText(ClubSettingsActivity.this, "There is no user with that email!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
+
                                         final String inviteeUid = dataSnapshot.getChildren().iterator().next().getKey();
                                         mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin")
                                                 .addListenerForSingleValueEvent(new ValueEventListener() {
