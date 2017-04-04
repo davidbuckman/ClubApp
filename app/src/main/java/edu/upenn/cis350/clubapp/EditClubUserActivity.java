@@ -111,6 +111,7 @@ public class EditClubUserActivity extends AppCompatActivity {
                     mDatabaseReference.child("clubs").child(clubID).child("members").child(userID).removeValue();
                     mDatabaseReference.child("users").child(userID).child("clubs").child(clubID).removeValue();
                     Toast.makeText(EditClubUserActivity.this, "removed user", Toast.LENGTH_LONG).show();
+                    finish();
                 } else {
                     Toast.makeText(EditClubUserActivity.this, "Cannot remove yourself!", Toast.LENGTH_LONG).show();
                 }
