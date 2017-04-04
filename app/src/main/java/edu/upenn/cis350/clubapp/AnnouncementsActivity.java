@@ -204,9 +204,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         i.putExtra("CLUB", clubID);
 
         int id = item.getItemId();
-        if (id == R.id.nav_information) {
-
-        } else if (id == R.id.nav_announcements) {
+        if (id == R.id.nav_announcements) {
             i.setClass(this, AnnouncementsActivity.class);
 
         } else if (id == R.id.nav_calendar) {

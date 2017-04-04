@@ -143,25 +143,31 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                         Toast.makeText(ClubSettingsActivity.this, "There is no user with that email!", Toast.LENGTH_LONG).show();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
-                                        // successful invite send
+                                        // check to see if the user invited is the current user
                                         String uid = dataSnapshot.getChildren().iterator().next().getKey();
-                                        // Update user's invited to list
-                                        mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
-
-                                        String title = userTitle.getText().toString().trim();
-                                        System.out.println("USER TITLE = " + title);
-
-                                        if(title.isEmpty()){
-                                            System.out.println("using default");
-                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
+                                        if (uid.equals(auth.getCurrentUser().getUid())) {
+                                            Log.e("ClubSettingsActivity", "Invited User is Admin");
+                                            Toast.makeText(ClubSettingsActivity.this, "You cannot invite yourself!", Toast.LENGTH_LONG).show();
+                                            progressBar.setVisibility(View.GONE);
                                         } else {
-                                            System.out.println("using: " + title);
-                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
+                                            // Update user's invited to list
+                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
+
+                                            String title = userTitle.getText().toString().trim();
+                                            System.out.println("USER TITLE = " + title);
+
+                                            if (title.isEmpty()) {
+                                                System.out.println("using default");
+                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
+                                            } else {
+                                                System.out.println("using: " + title);
+                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
+                                            }
+
+
+                                            Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
+                                            progressBar.setVisibility(View.GONE);
                                         }
-
-
-                                        Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
-                                        progressBar.setVisibility(View.GONE);
                                     }
                                 }
 
