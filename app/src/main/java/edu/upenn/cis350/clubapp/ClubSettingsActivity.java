@@ -154,17 +154,17 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                                         boolean isAdmin = (boolean) dataSnapshot.getValue();
                                                         if (isAdmin) {
                                                             // Update user's invited to list
-                                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
+                                                            mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
 
                                                             String title = userTitle.getText().toString().trim();
                                                             System.out.println("USER TITLE = " + title);
 
                                                             if(title.isEmpty()){
                                                                 System.out.println("using default");
-                                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
+                                                                mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).child("title").setValue("General Member");
                                                             } else {
                                                                 System.out.println("using: " + title);
-                                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
+                                                                mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).child("title").setValue(title);
                                                             }
                                                             Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
                                                             progressBar.setVisibility(View.GONE);
