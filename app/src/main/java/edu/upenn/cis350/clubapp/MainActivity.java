@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         DatabaseReference ref = mDatabaseReference.child("users/" + auth.getCurrentUser().getUid() + "/clubs");
-        //Say Hello to our new FirebaseUI android Element, i.e., FirebaseRecyclerAdapter
         FirebaseRecyclerAdapter<Boolean,ClubViewHolder> adapter = new FirebaseRecyclerAdapter<Boolean, ClubViewHolder>(
                 Boolean.class,
                 R.layout.card_layout_main,
@@ -82,10 +81,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final ClubViewHolder viewHolder, final Boolean model, int position) {
                 final String key = this.getRef(position).getKey();
-                mDatabaseReference.child("clubs").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                mDatabaseReference.child("clubs").child(key).addValueEventListener(new ValueEventListener() {
                      @Override
                      public void onDataChange(DataSnapshot dataSnapshot) {
-                         String name = dataSnapshot.child("name").getValue(String.class);
+                         Log.d("location testing", "in main");
+//                         System.out.println("CHANGES!!!! : " + dataSnapshot.child("name").getValue(String.class));
+                         System.out.println("making card for: " + dataSnapshot.getKey());
+                         String name = dataSnapshot.getKey().toString();
                          String about = dataSnapshot.child("about").getValue(String.class);
                          viewHolder.clubName.setText(name);
                          viewHolder.clubAbout.setText(about);

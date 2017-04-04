@@ -4,15 +4,18 @@ package edu.upenn.cis350.clubapp;
  * Created by abhi on 2/18/17.
  */
 
-public class ClubMember {
+public class ClubMember implements Comparable{
+    //allows for additional capabilities for managing club
     public boolean isAdmin;
+    //role in club
     public String title;
-    public int unreadNotifs;
+
 
     public ClubMember() {
     }
 
     public ClubMember(boolean isAdmin, String title) {
+
         this.isAdmin = isAdmin;
         this.title = title;
     }
@@ -22,7 +25,7 @@ public class ClubMember {
     }
 
     public String getTitle() {
-        return this.isAdmin ? this.title : "General Member";
+        return this.title;
     }
 
     public void setIsAdmin(boolean isAdmin) {
@@ -33,12 +36,18 @@ public class ClubMember {
         this.title = title;
     }
 
-    public int addUnreadNotification() {
-        this.unreadNotifs++;
-        return this.unreadNotifs;
-    }
+    @Override
+    public int compareTo(Object o) {
+        ClubMember other = (ClubMember) o;
 
-    public void resetUnreadNotifcations() {
-        this.unreadNotifs = 0;
+        if(this.getIsAdmin() == true && other.getIsAdmin() == false){
+            return -1;
+        } else if(this.getIsAdmin() == false && other.getIsAdmin() == true){
+            return 1;
+        } else{
+            //both admin or both general users
+            this.title.compareTo(other.title);
+        }
+        return 0;
     }
 }

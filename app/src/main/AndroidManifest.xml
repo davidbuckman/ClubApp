@@ -60,6 +60,17 @@
             android:name=".AddAnnouncementActivity"
             android:label="@string/title_activity_add_announcement"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".DirectoryActivity"
+            android:label="ClubDirectory"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".CalendarActivity"
+            android:label="CalendarActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CalendarEventActivity"
+            android:label="CalendarEventActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

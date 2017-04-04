@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -29,9 +30,12 @@ import com.google.firebase.database.ValueEventListener;
 public class ClubSettingsActivity extends AppCompatActivity {
 
     private EditText userEmail;
+    private EditText userTitle;
     private Button btnInviteUser;
     private Button inviteUser;
     private Button leaveGroup;
+    private CheckBox adminBox;
+    private boolean adminAuth = false;
 
     private ProgressBar progressBar;
     private FirebaseAuth.AuthStateListener authListener;
@@ -83,13 +87,21 @@ public class ClubSettingsActivity extends AppCompatActivity {
             }
         };
 
+        // update admin status
+        isAdmin(user, clubID);
+
         userEmail = (EditText) findViewById(R.id.user_email);
+        userTitle = (EditText) findViewById(R.id.user_title);
         btnInviteUser = (Button) findViewById(R.id.invite_user_button);
         inviteUser = (Button) findViewById(R.id.inviteUser);
         leaveGroup = (Button) findViewById(R.id.leave_club_button);
+        adminBox = (CheckBox) findViewById(R.id.adminBox);
 
         userEmail.setVisibility(View.GONE);
+        userTitle.setVisibility(View.GONE);
         inviteUser.setVisibility(View.GONE);
+        adminBox.setVisibility(View.GONE);
+
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -101,7 +113,9 @@ public class ClubSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 userEmail.setVisibility(View.VISIBLE);
+                userTitle.setVisibility(View.VISIBLE);
                 inviteUser.setVisibility(View.VISIBLE);
+                adminBox.setVisibility(View.VISIBLE);
             }
         });
 
@@ -110,6 +124,15 @@ public class ClubSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email = userEmail.getText().toString().trim();
+
+                // check if admin status is checked.
+                final boolean adminStatus = adminBox.isChecked();
+
+                //get title
+                //String title = userTitle.getText().toString().trim();
+                //System.out.println("THE USER TITLE = " + title);
+
+
                 if (!email.equals("")) {
                     mDatabaseReference.child("users").orderByChild("email").equalTo(email)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -131,7 +154,18 @@ public class ClubSettingsActivity extends AppCompatActivity {
                                                         boolean isAdmin = (boolean) dataSnapshot.getValue();
                                                         if (isAdmin) {
                                                             // Update user's invited to list
-                                                            mDatabaseReference.child("users").child(inviteeUid).child("invitations").child(clubID).setValue(true);
+                                                            mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("isAdmin").setValue(adminStatus);
+
+                                                            String title = userTitle.getText().toString().trim();
+                                                            System.out.println("USER TITLE = " + title);
+
+                                                            if(title.isEmpty()){
+                                                                System.out.println("using default");
+                                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue("General Member");
+                                                            } else {
+                                                                System.out.println("using: " + title);
+                                                                mDatabaseReference.child("users").child(uid).child("invitations").child(clubID).child("title").setValue(title);
+                                                            }
                                                             Toast.makeText(ClubSettingsActivity.this, "User has been invited!", Toast.LENGTH_LONG).show();
                                                             progressBar.setVisibility(View.GONE);
                                                         } else {
@@ -171,6 +205,37 @@ public class ClubSettingsActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+  
+  // I got rid of isAdmin due to asynchronousness making it too complicated and just built the
+  // admin check into the function itself. Leaving your todo but currently this function is useless -dcb
+
+    public boolean isAdmin(final FirebaseUser user, final String clubID) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference mDatabaseReference = database.getReference();
+        //get data and display
+        DatabaseReference ref = mDatabaseReference;
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            //mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("auth", "old adminAuth:" + adminAuth);
+                //get all members for the club
+                adminAuth = (boolean) dataSnapshot.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin").getValue();
+                Log.d("auth", "new adminAuth:" + adminAuth);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        // TODO
+        return adminAuth;
     }
 
     @Override

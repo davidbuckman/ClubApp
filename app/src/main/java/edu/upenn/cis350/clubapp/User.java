@@ -10,7 +10,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
  */
 
 @IgnoreExtraProperties
-public class User {
+public class User implements Comparable{
     public String firstName;
     public String lastName;
     public String email;
@@ -55,6 +55,30 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+
+
+    @Override
+    public int compareTo(Object o) {
+        User other = (User) o;
+
+        if(this.getLastName().equals(other.getLastName())){
+            //same last names, look to first names
+            if(this.getFirstName().equals(other.getFirstName())){
+                //same first name, look to emails
+                if(this.getEmail().equals(other.getEmail())){
+                    //same email. Assumes same user
+                    return 0;
+                } else{
+                    return this.getEmail().compareTo(other.getEmail());
+                }
+            } else {
+                return this.getFirstName().compareTo(other.getFirstName());
+            }
+        } else{
+            return this.getLastName().compareTo(other.getLastName());
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -33,6 +39,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
+
+        //Getting reference to Firebase Database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference mDatabaseReference = database.getReference();
 
 
         setSupportActionBar(toolbar);
@@ -225,11 +235,34 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 if (user != null) {
+                    //TODO: remove user from clubs, remove user from users
+                    System.out.println("currUserID = " + auth.getCurrentUser().getUid());
+                    mDatabaseReference.child("users").child(auth.getCurrentUser().getUid().toString()).child("clubs").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String userID = auth.getCurrentUser().getUid();
+                            System.out.println("removing user from club");
+                            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                System.out.println("removing user from club " + snapshot.getKey().toString());
+                                mDatabaseReference.child("clubs").child(snapshot.getKey().toString()).child("members").child(userID).removeValue();
+                            }
+
+                            //remove user
+                            mDatabaseReference.child("users").child(userID).removeValue();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    //then delete
                     user.delete()
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+
                                         Toast.makeText(SettingsActivity.this, "Your profile is deleted:( Create a account now!", Toast.LENGTH_SHORT).show();
                                         startActivity(new Intent(SettingsActivity.this, SignupActivity.class));
                                         finish();
