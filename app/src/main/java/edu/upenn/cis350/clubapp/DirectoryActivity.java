@@ -163,6 +163,7 @@ public class DirectoryActivity extends AppCompatActivity
                     System.out.println("added person with title " + title);
                     //membersList.add(new ClubMember(snapshot.getKey(), isAdmin , title));
 
+
                 }
 
 
