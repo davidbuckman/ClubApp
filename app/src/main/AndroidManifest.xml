@@ -74,9 +74,14 @@
             android:name=".CalendarEventActivity"
             android:label="CalendarEventActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".EditClubUserActivity"
+        <activity
+            android:name=".EditClubUserActivity"
             android:label="CalendarEventActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".InformationActivity"
+            android:label="ClubDescription"
+            android:theme="@style/AppTheme.NoActionBar" />>
     </application>
 
 </manifest>
