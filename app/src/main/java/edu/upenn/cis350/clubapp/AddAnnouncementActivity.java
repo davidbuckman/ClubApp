@@ -69,6 +69,8 @@ public class AddAnnouncementActivity extends AppCompatActivity {
                 DatabaseReference announcementRef = db.getReference().child("clubs").child(clubID).child("announcements").child(Long.toString(System.currentTimeMillis()));
                 announcementRef.child("title").setValue(title);
                 announcementRef.child("body").setValue(body);
+                //TODO: set channel?
+
                 finish();
             }
         });
