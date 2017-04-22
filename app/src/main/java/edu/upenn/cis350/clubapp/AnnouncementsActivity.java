@@ -107,7 +107,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         System.out.println("\nclub name in act =  " + clubID);
 
         // If club name is null, send back to main page
-        if (clubID == null) {
+        if (clubID == null){
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
             finish();
