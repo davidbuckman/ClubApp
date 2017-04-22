@@ -66,7 +66,8 @@ public class AddAnnouncementActivity extends AppCompatActivity {
 
                 progressBar.setVisibility(View.VISIBLE);
                 //create announcement
-                DatabaseReference announcementRef = db.getReference().child("clubs").child(clubID).child("announcements").child(Long.toString(System.currentTimeMillis()));
+                //TODO: add field for channel option b/c currently default to general
+                DatabaseReference announcementRef = db.getReference().child("clubs").child(clubID).child("channels").child("general").child(Long.toString(System.currentTimeMillis()));
                 announcementRef.child("title").setValue(title);
                 announcementRef.child("body").setValue(body);
                 finish();

@@ -6,8 +6,8 @@ import java.util.Date;
  * Created by abhi on 2/18/17.
  */
 
-public class ClubNotification {
-    String author, channel, content;
+public class ClubNotification implements Comparable{
+    String title, channel, body;
     long timeStamp;
 
     public ClubNotification() {
@@ -15,19 +15,22 @@ public class ClubNotification {
     }
 
 
-    public ClubNotification(String author, String channel, String content, long timeStamp) {
-        this.author = author;
+
+
+
+    public ClubNotification(String title, String channel, String body, long timeStamp) {
+        this.title = title;
         this.channel = channel;
-        this.content = content;
+        this.body = body;
         this.timeStamp = timeStamp;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getTitle() {
+        return title;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setTitle(String author) {
+        this.title = title;
     }
 
     public String getChannel() {
@@ -38,12 +41,12 @@ public class ClubNotification {
         this.channel = channel;
     }
 
-    public String getContent() {
-        return content;
+    public String getBody() {
+        return body;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setBody(String body) {
+        this.body = body;
     }
 
 
@@ -53,5 +56,21 @@ public class ClubNotification {
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        ClubNotification other = (ClubNotification) o;
+
+        if(this.getTimeStamp() > other.getTimeStamp()){
+            //comes earlier
+            return -1;
+        } else if(this.getTimeStamp() < other.getTimeStamp()){
+            //comes later
+            return 1;
+        } else{
+            //same timestamp
+            return this.getChannel().compareTo(other.getChannel());
+        }
     }
 }
