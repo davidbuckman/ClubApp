@@ -42,6 +42,7 @@
         android:layout_marginRight="23dp"
         android:layout_marginEnd="23dp"
         android:layout_marginBottom="22dp"
-        app:fabSize="mini"/>
+        app:fabSize="mini"
+        android:src="@drawable/ic_refresh"/>
 
 </android.support.design.widget.CoordinatorLayout>
