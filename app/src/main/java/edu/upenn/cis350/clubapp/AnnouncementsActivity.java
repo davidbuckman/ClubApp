@@ -64,7 +64,10 @@ public class AnnouncementsActivity extends AppCompatActivity
         i.putExtra("CLUB", clubID);
 
         int id = item.getItemId();
-        if (id == R.id.nav_announcements) {
+        if (id == R.id.nav_information) {
+            i.setClass(this, InformationActivity.class);
+
+        } else if (id == R.id.nav_announcements) {
             i.setClass(this, AnnouncementsActivity.class);
 
         } else if (id == R.id.nav_calendar) {
@@ -124,6 +127,17 @@ public class AnnouncementsActivity extends AppCompatActivity
         //using staggered grid pattern in recyclerview
         mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        //set up refresh button
+        final FloatingActionButton refresh = (FloatingActionButton) findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(getIntent().putExtra("CLUB", clubID));
+            }
+        });
+
 
         //button for admins to add announcements
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

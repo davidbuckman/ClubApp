@@ -22,4 +22,10 @@
         app:headerLayout="@layout/nav_header_announcements"
         app:menu="@menu/activity_announcements_drawer" />
 
+
+
+
+
+
+
 </android.support.v4.widget.DrawerLayout>
