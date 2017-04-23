@@ -107,7 +107,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         System.out.println("\nclub name in act =  " + clubID);
 
         // If club name is null, send back to main page
-        if (clubID == null){
+        if (clubID == null) {
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
             finish();
@@ -176,372 +176,118 @@ public class AnnouncementsActivity extends AppCompatActivity
         });
 
 
-        /**************************************************
-         * begin refactor for recycler adapter
-         **************************************************/
+        /****************
+         * Get all of the messages that the user needs to see and pass to viewer
+         ***************/
 
-        System.out.println("Starting refactor?");
+        // Initialize data structures
+        usersChannels = new HashSet<String>();
+        messages = new TreeSet<ClubNotification>();
 
-
-        DatabaseReference ref = mDatabaseReference;
-
-        final FirebaseRecyclerAdapter<ClubNotification, NotificationViewHolder> adapter = new FirebaseRecyclerAdapter<ClubNotification, NotificationViewHolder>(
-                ClubNotification.class,
-                R.layout.message_layout,
-                NotificationViewHolder.class,
-                ref.child("clubs").child(clubID).child("channels").getRef()
-        ) {
+        //get data and display
+        DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            protected void populateViewHolder(final NotificationViewHolder viewHolder, ClubNotification model, int position) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Initialize data structures
-                usersChannels = new HashSet<String>();
-                messages = new TreeSet<ClubNotification>();
-
-                //get data and display
-                DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        System.out.println("curr user is " + user.getUid());
-                        // System.out.println(dataSnapshot.getValue().toString());
+                //get all channels for the club
+                for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()) {
+                    System.out.println("\n   channel: " + snapshot.getKey());
+                    usersChannels.add(snapshot.getKey().toString());
+                }
+                System.out.println("size of channel array= " + usersChannels.size());
 
 
-//                        //get all channels for the club
-//                        for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()) {
-//                            System.out.println("\n   channel: " + snapshot.getKey());
-//                            usersChannels.add(snapshot.getKey().toString());
-//                        }
-//                        System.out.println("size of channel array= " + usersChannels.size());
+                //get messages for user's channels
+                for (DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()) {
+                    //determine if current channel is in the user's list
+                    System.out.println("current channel is: " + snapshot.getKey().toString());
+                    if (usersChannels.contains(snapshot.getKey().toString())) {
+                        for (DataSnapshot subShot : snapshot.getChildren()) {
+                            //add this channel's messages to the set to display
+                            System.out.println("adding messages from " + snapshot.getKey().toString());
+                            ClubNotification newNotif =
+                                    new ClubNotification(
+                                            subShot.child("title").getValue(String.class),
+                                            snapshot.getKey().toString(), //channel
+                                            subShot.child("body").getValue(String.class),
+                                            Long.parseLong(subShot.getKey())); //timestamp
+                            messages.add(newNotif);
+                            System.out.println("in method number of notifications is " + messages.size());
 
-
-                        //get messages for user's channels
-                        for (DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()) {
-                            //determine if current channel is in the user's list
-                            System.out.println("current channel is: " + snapshot.getKey().toString());
-                            //if (usersChannels.contains(snapshot.getKey().toString())) {
-                                for (DataSnapshot subShot : snapshot.getChildren()) {
-                                    //add this channel's messages to the set to display
-                                    System.out.println("adding messages from " + snapshot.getKey().toString());
-                                    ClubNotification newNotif =
-                                            new ClubNotification(
-                                                    subShot.child("title").getValue(String.class),
-                                                    snapshot.getKey().toString(), //channel
-                                                    subShot.child("body").getValue(String.class),
-                                                    Long.parseLong(subShot.getKey())); //timestamp
-                                    messages.add(newNotif);
-                                    System.out.println("in method number of notifications is " + messages.size());
-
-
-                                    //post to cards
-//                                    viewHolder.title.setText(newNotif.getTitle());
-//                                    viewHolder.body.setText(newNotif.getBody());
-//                                    viewHolder.channel.setText(newNotif.getChannel());
-                                }
-
-                            //}
-                        }
-
-                        System.out.println("number of notifications is " + messages.size());
-
-
-                        Iterator<ClubNotification> iter = messages.iterator();
-                        ClubNotification notif;
-                        while(iter.hasNext()){
-                            notif = iter.next();
-                            viewHolder.title.setText(notif.getTitle());
-                            viewHolder.body.setText(notif.getBody());
-                            viewHolder.channel.setText(notif.getChannel());
 
                         }
 
-
-//                        // David's announcement viewing, potentially temporary
-//                        DataSnapshot announcements = dataSnapshot.child("clubs").child(clubID).child("announcements");
-//                        for (DataSnapshot announcement : announcements.getChildren()) {
-//                            ClubNotification notification = new ClubNotification(
-//                                    announcement.child("body").getValue(String.class),
-//                                    "General",
-//                                    announcement.child("title").getValue(String.class),
-//                                    Long.parseLong(announcement.getKey()));
-//                            messages.add(notification);
-//                        }
-
-
                     }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                System.out.println("number of notifications is " + messages.size());
 
-                    }
-                });
+                //pass to adapter
+                RVAdapter adapter = new RVAdapter(messages);
+                mRecyclerView.setAdapter(adapter);
+
 
             }
-        };
 
-        mRecyclerView.setAdapter(adapter);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
+            }
+
+        });
 
     }
 
 
-    /**
-     * LIVE UPDATE ? Only one message
-     */
+    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NotificationViewHolder> {
+        ArrayList<ClubNotification> messages;
 
-//        DatabaseReference ref = mDatabaseReference;
-//
-//        final FirebaseRecyclerAdapter<ClubNotification, NotificationViewHolder> adapter = new FirebaseRecyclerAdapter<ClubNotification, NotificationViewHolder>(
-//                ClubNotification.class,
-//                R.layout.message_layout,
-//                NotificationViewHolder.class,
-//                ref.child("clubs").child(clubID).child("channels").getRef()
-//        ) {
-//            @Override
-//            protected void populateViewHolder(final NotificationViewHolder viewHolder, ClubNotification model, int position) {
-//
-//                // Initialize data structures
-//                usersChannels = new HashSet<String>();
-//                messages = new TreeSet<ClubNotification>();
-//
-//                //get data and display
-//                DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
-//                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                        System.out.println("curr user is " + user.getUid());
-//                       // System.out.println(dataSnapshot.getValue().toString());
-//
-//
-//
-//                        //get all channels for the club
-//                        for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()){
-//                            System.out.println("\n   channel: " + snapshot.getKey());
-//                            usersChannels.add(snapshot.getKey().toString());
-//                        }
-//                        System.out.println("size of channel array= " + usersChannels.size());
-//
-//
-//                        //get messages for user's channels
-//                        for(DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()){
-//                            //determine if current channel is in the user's list
-//                            System.out.println("current channel is: " + snapshot.getKey().toString());
-//                            if(usersChannels.contains(snapshot.getKey().toString())){
-//                                for(DataSnapshot subShot : snapshot.getChildren()){
-//                                    //add this channel's messages to the set to display
-//                                    System.out.println("adding messages from " + snapshot.getKey().toString());
-//                                    ClubNotification newNotif =
-//                                            new ClubNotification(
-//                                                    subShot.child("title").getValue(String.class),
-//                                                    snapshot.getKey().toString(), //channel
-//                                                    subShot.child("body").getValue(String.class),
-//                                                    Long.parseLong(subShot.getKey())); //timestamp
-//                                    messages.add(newNotif);
-//                                    System.out.println("in method number of notifications is " + messages.size());
-//
-//
-//                                    //post to cards
-//                                    viewHolder.title.setText(newNotif.getTitle());
-//                                    viewHolder.body.setText(newNotif.getBody());
-//                                    viewHolder.channel.setText(newNotif.getChannel());
-//                                }
-//
-//                            }
-//                        }
-//
-//                        System.out.println("number of notifications is " + messages.size());
-//
-//
-//
-//
-//
-////                        Iterator<ClubNotification> iter = messages.iterator();
-////                        ClubNotification notif;
-////                        while(iter.hasNext()){
-////                            notif = iter.next();
-////                            viewHolder.title.setText(notif.getTitle());
-////                            viewHolder.body.setText(notif.getBody());
-////                            viewHolder.channel.setText(notif.getChannel());
-////
-////                        }
-//
-//
-//
-//
-//
-//
-////                        // David's announcement viewing, potentiall temporary
-////                        DataSnapshot announcements = dataSnapshot.child("clubs").child(clubID).child("announcements");
-////                        for (DataSnapshot announcement : announcements.getChildren()) {
-////                            ClubNotification notification = new ClubNotification(
-////                                    announcement.child("body").getValue(String.class),
-////                                    "General",
-////                                    announcement.child("title").getValue(String.class),
-////                                    Long.parseLong(announcement.getKey()));
-////                            messages.add(notification);
-////                        }
-//
-//
-//                    }
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-//
-//            }
-//        };
-//
-//        mRecyclerView.setAdapter(adapter);
-//
-//
-//    }
+        RVAdapter(TreeSet<ClubNotification> msg) {
+            messages = new ArrayList(msg);
 
 
-    /****************
-     * NO LIVE UPDATE
-     */
-//        // Initialize data structures
-//        usersChannels = new HashSet<String>();
-//        messages = new TreeSet<ClubNotification>();
-//
-//        //get data and display
-//        DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
-//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                System.out.println("curr user is " + user.getUid());
-//                // System.out.println(dataSnapshot.getValue().toString());
-//
-//
-//                //get all channels for the club
-//                for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()) {
-//                    System.out.println("\n   channel: " + snapshot.getKey());
-//                    usersChannels.add(snapshot.getKey().toString());
-//                }
-//                System.out.println("size of channel array= " + usersChannels.size());
-//
-//
-//                //get messages for user's channels
-//                for (DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()) {
-//                    //determine if current channel is in the user's list
-//                    System.out.println("current channel is: " + snapshot.getKey().toString());
-//                    if (usersChannels.contains(snapshot.getKey().toString())) {
-//                        for (DataSnapshot subShot : snapshot.getChildren()) {
-//                            //add this channel's messages to the set to display
-//                            System.out.println("adding messages from " + snapshot.getKey().toString());
-//                            ClubNotification newNotif =
-//                                    new ClubNotification(
-//                                            subShot.child("title").getValue(String.class),
-//                                            snapshot.getKey().toString(), //channel
-//                                            subShot.child("body").getValue(String.class),
-//                                            Long.parseLong(subShot.getKey())); //timestamp
-//                            messages.add(newNotif);
-//                            System.out.println("in method number of notifications is " + messages.size());
-//
-//
-//                        }
-//
-//                    }
-//                }
-//
-//                System.out.println("number of notifications is " + messages.size());
-//
-//
-////                        Iterator<ClubNotification> iter = messages.iterator();
-////                        ClubNotification notif;
-////                        while(iter.hasNext()){
-////                            notif = iter.next();
-////                            viewHolder.title.setText(notif.getTitle());
-////                            viewHolder.body.setText(notif.getBody());
-////                            viewHolder.channel.setText(notif.getChannel());
-////
-////                        }
-//
-//                RVAdapter adapter = new RVAdapter(messages);
-//                mRecyclerView.setAdapter(adapter);
-//
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//
-//        });
-//
-//    }
+        }
 
+        @Override
+        public RVAdapter.NotificationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout, parent, false);
+            RVAdapter.NotificationViewHolder nvh = new RVAdapter.NotificationViewHolder(v);
+            return nvh;
+        }
 
-    //ViewHolder for our Firebase UI
-    public static class NotificationViewHolder extends RecyclerView.ViewHolder {
+        @Override
+        public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, int position) {
+            holder.title.setText(messages.get(position).getTitle());
+            holder.body.setText(messages.get(position).getBody());
+            holder.channel.setText(messages.get(position).getChannel());
+        }
 
-        TextView title;
-        TextView body;
-        TextView channel;
+        @Override
+        public int getItemCount() {
+            return messages.size();
+        }
 
-        public NotificationViewHolder(View v) {
-            super(v);
-            title = (TextView) v.findViewById(R.id.message_title);
-            body = (TextView) v.findViewById(R.id.message_body);
-            channel = (TextView) v.findViewById(R.id.message_channel);
+        @Override
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+        }
+
+        public class NotificationViewHolder extends RecyclerView.ViewHolder {
+
+            TextView title;
+            TextView body;
+            TextView channel;
+
+            public NotificationViewHolder(View v) {
+                super(v);
+                title = (TextView) v.findViewById(R.id.message_title);
+                body = (TextView) v.findViewById(R.id.message_body);
+                channel = (TextView) v.findViewById(R.id.message_channel);
+            }
         }
     }
 }
 
-
-
-//public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NotificationViewHolder>{
-//
-//    TreeSet<ClubNotification> messageSet;
-//    ArrayList<ClubNotification> messages;
-//
-//    RVAdapter(TreeSet<ClubNotification> msg){
-//        this.messageSet = msg;
-//        messages = new ArrayList(messageSet);
-//
-//    }
-//
-//    @Override
-//    public RVAdapter.NotificationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout, parent, false);
-//        RVAdapter.NotificationViewHolder nvh = new RVAdapter.NotificationViewHolder(v);
-//        return nvh;
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, int position) {
-//        holder.title.setText(messages.get(position).getTitle());
-//        holder.body.setText(messages.get(position).getBody());
-//        holder.channel.setText(messages.get(position).getChannel());
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return messages.size();
-//    }
-//
-//    @Override
-//    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-//        super.onAttachedToRecyclerView(recyclerView);
-//    }
-//
-//    public class NotificationViewHolder extends RecyclerView.ViewHolder{
-//
-//        TextView title;
-//        TextView body;
-//        TextView channel;
-//
-//        public NotificationViewHolder(View v) {
-//            super(v);
-//            title = (TextView) v.findViewById(R.id.message_title);
-//            body = (TextView) v.findViewById(R.id.message_body);
-//            channel = (TextView) v.findViewById(R.id.message_channel);
-//        }
-//    }
 
 
