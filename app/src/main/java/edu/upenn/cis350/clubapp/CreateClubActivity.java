@@ -98,11 +98,22 @@ public class CreateClubActivity extends AppCompatActivity {
                 //create
                 Toast.makeText(getApplicationContext(), "Your club was made!", Toast.LENGTH_SHORT).show();
 
+                //create club
                 Club newClub = new Club(name, about, auth.getCurrentUser().getUid(), true);
                 newClub.setChannels(channels);
 
                 //add to database
                 mDatabaseReference.child("clubs").child(name).setValue(newClub);
+
+                //uncomment to add createor to every channel
+//                for(String chan : channels.keySet()){
+//                    mDatabaseReference.child("clubs").child(name).child("members")
+//                            .child(auth.getCurrentUser().getUid()).child("channels").child(chan).setValue(true);
+//                }
+                //add creator just to general
+                mDatabaseReference.child("clubs").child(name).child("members")
+                            .child(auth.getCurrentUser().getUid()).child("channels").child("general").setValue(true);
+
 
                 //update user profile
                 mDatabaseReference.child("users").child(auth.getCurrentUser().getUid()).child("clubs").child(name).setValue(true);

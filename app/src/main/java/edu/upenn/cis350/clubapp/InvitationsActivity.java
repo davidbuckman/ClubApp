@@ -126,6 +126,9 @@ public class InvitationsActivity extends AppCompatActivity {
                 userInClub.child("isAdmin").setValue(adminStatus);
                 System.out.println("Title = " + title);
                 userInClub.child("title").setValue(title);
+
+                //add user to general automatically
+                userInClub.child("channels").child("general").setValue(true);
             }
 
             @Override

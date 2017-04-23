@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,17 +33,19 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 public class AnnouncementsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private HashSet<String> clubChannels;
-    private HashSet<String> myChannels;
-    private HashSet<ClubNotification> messages;
+    //global data structures
+    private HashSet<String> usersChannels;
+    private TreeSet<ClubNotification> messages; //leverage implicit ordering using custom comparator
 
     //Getting reference to Firebase Database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -53,6 +56,47 @@ public class AnnouncementsActivity extends AppCompatActivity
     FirebaseUser user = auth.getCurrentUser();
 
     String clubID;
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        Intent i = new Intent();
+        i.putExtra("CLUB", clubID);
+
+        int id = item.getItemId();
+        if (id == R.id.nav_information) {
+            i.setClass(this, InformationActivity.class);
+
+        } else if (id == R.id.nav_announcements) {
+            i.setClass(this, AnnouncementsActivity.class);
+
+        } else if (id == R.id.nav_calendar) {
+            i.setClass(this, CalendarActivity.class);
+
+        } else if (id == R.id.nav_directory) {
+            i.setClass(this, DirectoryActivity.class);
+
+        } else if (id == R.id.nav_club_settings) {
+            i.setClass(this, ClubSettingsActivity.class);
+        }
+
+        startActivity(i);
+        finish();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +110,36 @@ public class AnnouncementsActivity extends AppCompatActivity
         System.out.println("\nclub name in act =  " + clubID);
 
         // If club name is null, send back to main page
-        if (clubID == null){
+        if (clubID == null) {
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
             finish();
         }
 
+        //set up for display
+        mRecyclerView = (RecyclerView) findViewById(R.id.notification_recycler_view);
+
+        if (mRecyclerView != null) {
+            //to enable optimization of recyclerview
+            mRecyclerView.setHasFixedSize(true);
+        }
+
+        //using staggered grid pattern in recyclerview
+        mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        //set up refresh button
+        final FloatingActionButton refresh = (FloatingActionButton) findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(getIntent().putExtra("CLUB", clubID));
+            }
+        });
+
+
+        //button for admins to add announcements
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         mDatabaseReference.child("clubs").child(clubID).child("members").child(user.getUid()).child("isAdmin")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -120,152 +188,79 @@ public class AnnouncementsActivity extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-//        navigationHeaderEmail.setText(auth.getCurrentUser().getEmail());
+
+
+        /****************
+         * Get all of the messages that the user needs to see and pass to viewer
+         ***************/
 
         // Initialize data structures
-        clubChannels = new HashSet<String>();
-        myChannels = new HashSet<String>();
-        messages = new HashSet<ClubNotification>();
-
-        //set up for display
-        mRecyclerView = (RecyclerView) findViewById(R.id.notification_recycler_view);
-
-        if (mRecyclerView != null) {
-            //to enable optimization of recyclerview
-            mRecyclerView.setHasFixedSize(true);
-        }
-
-        //using staggered grid pattern in recyclerview
-        mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        usersChannels = new HashSet<String>();
+        messages = new TreeSet<ClubNotification>();
 
         //get data and display
-        DatabaseReference ref = mDatabaseReference;
+        DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 //get all channels for the club
-                for (DataSnapshot snapshot : dataSnapshot.child("clubs").child(clubID).child("channels").getChildren()){
-                    System.out.println("\n channel: " + snapshot.getKey());
-                    clubChannels.add(snapshot.getKey());
+                for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()) {
+                    System.out.println("\n   channel: " + snapshot.getKey());
+                    usersChannels.add(snapshot.getKey().toString());
                 }
-                System.out.println("size of channel array= " + clubChannels.size());
+                System.out.println("size of channel array= " + usersChannels.size());
 
 
-                //look at club's channels to see if user is subscribed
-                Iterator<String> iter = clubChannels.iterator();
-                while (iter.hasNext()){
-                    String channelID = iter.next();
-                    for(DataSnapshot snapshot : dataSnapshot.child("channels").child(channelID).getChildren()){
-                        System.out.println("\n curr channel: " + snapshot.getKey());
-                        if(snapshot.getKey().toString().contentEquals("subscribers")){
-                            for(DataSnapshot subshot : snapshot.getChildren()){
-                                System.out.println("Sub to " + channelID + " = " + subshot.getKey());
-                                if(subshot.getKey().equals(auth.getCurrentUser().getUid())){
-                                    System.out.println("BINGO!");
-                                    myChannels.add(channelID);
-                                }
-                            }
+                //get messages for user's channels
+                for (DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()) {
+                    //determine if current channel is in the user's list
+                    System.out.println("current channel is: " + snapshot.getKey().toString());
+                    if (usersChannels.contains(snapshot.getKey().toString())) {
+                        for (DataSnapshot subShot : snapshot.getChildren()) {
+                            //add this channel's messages to the set to display
+                            System.out.println("adding messages from " + snapshot.getKey().toString());
+                            ClubNotification newNotif =
+                                    new ClubNotification(
+                                            subShot.child("title").getValue(String.class),
+                                            snapshot.getKey().toString(), //channel
+                                            subShot.child("body").getValue(String.class),
+                                            Long.parseLong(subShot.getKey())); //timestamp
+                            messages.add(newNotif);
+                            System.out.println("in method number of notifications is " + messages.size());
+
+
                         }
+
                     }
                 }
 
-                System.out.println("size of my chan array= " + myChannels.size());
+                System.out.println("number of notifications is " + messages.size());
 
-
-                final Iterator<String> myIter = myChannels.iterator();
-                System.out.println("we have iter? " + myIter.hasNext());
-                if(!myIter.hasNext()){
-                    // Toast.makeText(AnnouncementsActivity.this,
-                    //        "You have no new messages!",
-                    //        Toast.LENGTH_LONG).show();
-                }
-                while (myIter.hasNext()){
-                    String channel = myIter.next();
-                    for(DataSnapshot snapshot : dataSnapshot.child("messages").child(channel).getChildren()){
-                        ClubNotification newNotif =
-                                new ClubNotification(
-                                        snapshot.child("author").getValue(String.class),
-                                        channel,
-                                        snapshot.child("content").getValue(String.class),
-                                        snapshot.child("timeStamp").getValue(Long.class));
-                        messages.add(newNotif);
-                    }
-
-                }
-
-                // David's announcement viewing, potentiall temporary
-                DataSnapshot announcements = dataSnapshot.child("clubs").child(clubID).child("announcements");
-                for (DataSnapshot announcement : announcements.getChildren()) {
-                    ClubNotification notification = new ClubNotification(
-                            announcement.child("body").getValue(String.class),
-                            "General",
-                            announcement.child("title").getValue(String.class),
-                            Long.parseLong(announcement.getKey()));
-                    messages.add(notification);
-                }
-
+                //pass to adapter
                 RVAdapter adapter = new RVAdapter(messages);
                 mRecyclerView.setAdapter(adapter);
 
+
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
+
         });
+
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        Intent i = new Intent();
-        i.putExtra("CLUB", clubID);
-
-        int id = item.getItemId();
-        if (id == R.id.nav_information){
-            i.setClass(this, InformationActivity.class);
-        } else if (id == R.id.nav_announcements) {
-            i.setClass(this, AnnouncementsActivity.class);
-        } else if (id == R.id.nav_calendar) {
-            i.setClass(this, CalendarActivity.class);
-        } else if (id == R.id.nav_directory) {
-            i.setClass(this, DirectoryActivity.class);
-
-        } else if (id == R.id.nav_club_settings) {
-            i.setClass(this, ClubSettingsActivity.class);
-        }
-
-        startActivity(i);
-        finish();
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NotificationViewHolder>{
-
-        HashSet<ClubNotification> messageSet;
+    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NotificationViewHolder> {
         ArrayList<ClubNotification> messages;
 
-        RVAdapter(HashSet<ClubNotification> msg){
-            this.messageSet = msg;
-            messages = new ArrayList(messageSet);
-            for(ClubNotification notif : messages){
-                System.out.println(notif.getAuthor());
-            }
+        RVAdapter(TreeSet<ClubNotification> msg) {
+            messages = new ArrayList(msg);
+
+
         }
 
         @Override
@@ -277,8 +272,8 @@ public class AnnouncementsActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, int position) {
-            holder.author.setText(messages.get(position).getAuthor());
-            holder.content.setText(messages.get(position).getContent());
+            holder.title.setText(messages.get(position).getTitle());
+            holder.body.setText(messages.get(position).getBody());
             holder.channel.setText(messages.get(position).getChannel());
         }
 
@@ -292,19 +287,21 @@ public class AnnouncementsActivity extends AppCompatActivity
             super.onAttachedToRecyclerView(recyclerView);
         }
 
-        //ViewHolder for our Firebase UI
-        public class NotificationViewHolder extends RecyclerView.ViewHolder{
+        public class NotificationViewHolder extends RecyclerView.ViewHolder {
 
-            TextView author;
-            TextView content;
+            TextView title;
+            TextView body;
             TextView channel;
 
             public NotificationViewHolder(View v) {
                 super(v);
-                author = (TextView) v.findViewById(R.id.message_author);
-                content = (TextView) v.findViewById(R.id.message_content);
+                title = (TextView) v.findViewById(R.id.message_title);
+                body = (TextView) v.findViewById(R.id.message_body);
                 channel = (TextView) v.findViewById(R.id.message_channel);
             }
         }
     }
 }
+
+
+

@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Add a club by tapping the big yellow button (until we get a Plus drawable asset)"
+        android:text="Add a club by tapping the big yellow button"
         android:textAlignment="center"
         android:textSize="18sp"/>
 
