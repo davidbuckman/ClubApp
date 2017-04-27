@@ -204,7 +204,7 @@ public class AnnouncementsActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                //get all channels for the club
+                //populate userChannels with list of channels this user is subscribed to
                 for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()) {
                     System.out.println("\n   channel: " + snapshot.getKey());
                     usersChannels.add(snapshot.getKey().toString());
