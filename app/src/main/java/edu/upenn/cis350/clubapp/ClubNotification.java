@@ -1,5 +1,8 @@
 package edu.upenn.cis350.clubapp;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+
 import java.util.Date;
 
 /**
@@ -9,6 +12,8 @@ import java.util.Date;
 public class ClubNotification implements Comparable{
     String title, channel, body;
     long timeStamp;
+    DatabaseReference ref;
+    boolean isAdmin;
 
     public ClubNotification() {
 
@@ -18,11 +23,13 @@ public class ClubNotification implements Comparable{
 
 
 
-    public ClubNotification(String title, String channel, String body, long timeStamp) {
+    public ClubNotification(String title, String channel, String body, long timeStamp, DatabaseReference ref, boolean isAdmin) {
         this.title = title;
         this.channel = channel;
         this.body = body;
         this.timeStamp = timeStamp;
+        this.ref = ref;
+        this.isAdmin = isAdmin;
     }
 
     public String getTitle() {
@@ -57,6 +64,12 @@ public class ClubNotification implements Comparable{
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
+
+    public DatabaseReference getRef() { return ref; }
+
+    public boolean isAdmin() { return this.isAdmin; }
+
+    public void setIsAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
 
     @Override
     public int compareTo(Object o) {

@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -199,7 +200,7 @@ public class AnnouncementsActivity extends AppCompatActivity
         messages = new TreeSet<ClubNotification>();
 
         //get data and display
-        DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
+        final DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -211,6 +212,8 @@ public class AnnouncementsActivity extends AppCompatActivity
                 }
                 System.out.println("size of channel array= " + usersChannels.size());
 
+                //check admin for delete announcement button
+                final boolean isAdmin = dataSnapshot.child("members").child(user.getUid()).child("isAdmin").getValue(boolean.class);
 
                 //get messages for user's channels
                 for (DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()) {
@@ -225,7 +228,9 @@ public class AnnouncementsActivity extends AppCompatActivity
                                             subShot.child("title").getValue(String.class),
                                             snapshot.getKey().toString(), //channel
                                             subShot.child("body").getValue(String.class),
-                                            Long.parseLong(subShot.getKey())); //timestamp
+                                            Long.parseLong(subShot.getKey()), //timestamp
+                                            ref.child("channels").child(snapshot.getKey().toString()),
+                                            isAdmin);
                             messages.add(newNotif);
                             System.out.println("in method number of notifications is " + messages.size());
 
@@ -271,10 +276,20 @@ public class AnnouncementsActivity extends AppCompatActivity
         }
 
         @Override
-        public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, int position) {
+        public void onBindViewHolder(RVAdapter.NotificationViewHolder holder, final int position) {
             holder.title.setText(messages.get(position).getTitle());
             holder.body.setText(messages.get(position).getBody());
             holder.channel.setText(messages.get(position).getChannel());
+            if (messages.get(position).isAdmin()) {
+                holder.deleteAnnouncement.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        messages.get(position).getRef().removeValue();
+                    }
+                });
+            } else {
+                holder.deleteAnnouncement.setVisibility(View.GONE);
+            }
         }
 
         @Override
@@ -292,12 +307,14 @@ public class AnnouncementsActivity extends AppCompatActivity
             TextView title;
             TextView body;
             TextView channel;
+            Button deleteAnnouncement;
 
             public NotificationViewHolder(View v) {
                 super(v);
                 title = (TextView) v.findViewById(R.id.message_title);
                 body = (TextView) v.findViewById(R.id.message_body);
                 channel = (TextView) v.findViewById(R.id.message_channel);
+                deleteAnnouncement = (Button) v.findViewById(R.id.delete_announcement_button);
             }
         }
     }
