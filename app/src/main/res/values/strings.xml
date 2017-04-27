@@ -77,5 +77,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_calendar_event">CalendarEventActivity</string>
 
+    <string name="choose_announcement_channel_prompt">Choose a channel</string>
+
 
 </resources>
