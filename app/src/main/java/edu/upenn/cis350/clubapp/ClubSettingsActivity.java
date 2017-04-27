@@ -1,16 +1,23 @@
 package edu.upenn.cis350.clubapp;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,11 +30,26 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.nio.channels.Channel;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Created by david on 3/6/2017.
  */
 
 public class ClubSettingsActivity extends AppCompatActivity {
+
+    //new data structures for list of channels
+    private HashSet<String> usersChannels;
+    private HashSet<UserChannel> clubChannels;
+
+    //Getting reference to Firebase Database
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference mDatabaseReference = database.getReference();
+
+    ListView channelList;
 
     private EditText userEmail;
     private EditText userTitle;
@@ -234,7 +256,87 @@ public class ClubSettingsActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
+
+
+        // Initialize data structures to contain channel info
+        clubChannels = new HashSet<>();
+        usersChannels = new HashSet<>();
+
+
+        //get data and display
+        DatabaseReference ref = mDatabaseReference.child("clubs").child(clubID);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // populate clubChannels with all channels in club
+                for (DataSnapshot snapshot : dataSnapshot.child("channels").getChildren()) {
+                    //determine if current channel is in the user's list
+                    System.out.println("this channel in club: " + snapshot.getKey().toString());
+                    clubChannels.add(new UserChannel(snapshot.getKey().toString()));
+                    if (usersChannels.contains(snapshot.getKey().toString())) {
+
+                    }
+                }
+
+                //populate userChannels with list of channels this user is subscribed to
+                for (DataSnapshot snapshot : dataSnapshot.child("members").child(user.getUid()).child("channels").getChildren()) {
+                    System.out.println("\n   channel: " + snapshot.getKey());
+                    usersChannels.add(snapshot.getKey().toString());
+                }
+                System.out.println("size of user channel set= " + usersChannels.size());
+
+                for(UserChannel u: clubChannels) {
+                    if(usersChannels.contains(u.getName())) {
+                        u.setActive(true);
+                    }
+                }
+
+                //todo: pass to adapter
+                populateChannelList( clubChannels.toArray(new UserChannel[clubChannels.size()]));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+
+
+
     }
+
+    private void populateChannelList(UserChannel[] clubChannels) {
+        ChannelAdapter ca = new ChannelAdapter(this, clubChannels);
+        channelList = (ListView) findViewById(R.id.channel_listview);
+        channelList.setAdapter(ca);
+
+    }
+
+    class ChannelAdapter extends ArrayAdapter<UserChannel> {
+        UserChannel[] channels = null;
+        Context context;
+        public ChannelAdapter(Context context, UserChannel[] channelArr) {
+            super(context,R.layout.checkbox_row,channelArr);
+            this.context = context;
+            channels = channelArr;
+        }
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // TODO Auto-generated method stub
+            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+            convertView = inflater.inflate(R.layout.checkbox_row, parent, false);
+            TextView label = (TextView) convertView.findViewById(R.id.textView);
+            CheckBox box = (CheckBox) convertView.findViewById(R.id.checkBox);
+            label.setText(channels[position].getName());
+            box.setChecked(channels[position].getActive());
+            return convertView;
+        }
+    }
+
   
   // I got rid of isAdmin due to asynchronousness making it too complicated and just built the
   // admin check into the function itself. Leaving your todo but currently this function is useless -dcb
@@ -266,6 +368,8 @@ public class ClubSettingsActivity extends AppCompatActivity {
         // TODO
         return adminAuth;
     }
+
+
 
     @Override
     protected void onResume() {
