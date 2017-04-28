@@ -233,7 +233,7 @@ public class AnnouncementsActivity extends AppCompatActivity
                                             snapshot.getKey().toString(), //channel
                                             subShot.child("body").getValue(String.class),
                                             Long.parseLong(subShot.getKey()), //timestamp
-                                            ref.child("channels").child(snapshot.getKey().toString()),
+                                            ref.child("channels").child(snapshot.getKey().toString()).child(snapshot.getKey().toString()),
                                             isAdmin);
                             messages.add(newNotif);
                             System.out.println("in method number of notifications is " + messages.size());
