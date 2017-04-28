@@ -135,6 +135,8 @@ public class AnnouncementsActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 finish();
+                getIntent().addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
                 startActivity(getIntent().putExtra("CLUB", clubID));
             }
         });
