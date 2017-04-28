@@ -227,13 +227,14 @@ public class AnnouncementsActivity extends AppCompatActivity
                         for (DataSnapshot subShot : snapshot.getChildren()) {
                             //add this channel's messages to the set to display
                             System.out.println("adding messages from " + snapshot.getKey().toString());
+                            System.out.println(subShot.getKey());
                             ClubNotification newNotif =
                                     new ClubNotification(
                                             subShot.child("title").getValue(String.class),
-                                            snapshot.getKey().toString(), //channel
+                                            snapshot.getKey(), //channel
                                             subShot.child("body").getValue(String.class),
                                             Long.parseLong(subShot.getKey()), //timestamp
-                                            ref.child("channels").child(snapshot.getKey().toString()).child(subShot.getKey()),
+                                            ref.child("channels").child(snapshot.getKey()).child(subShot.getKey()),
                                             isAdmin);
                             messages.add(newNotif);
                             System.out.println("in method number of notifications is " + messages.size());
@@ -288,7 +289,23 @@ public class AnnouncementsActivity extends AppCompatActivity
                 holder.deleteAnnouncement.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        messages.get(position).getRef().removeValue();
+                        System.out.println(messages.get(position).getRef().getKey());
+                        messages.get(position).getRef().getParent()
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.getChildrenCount() == 1) {
+                                            messages.get(position).getRef().getParent().setValue(true);
+                                        } else {
+                                            messages.get(position).getRef().removeValue();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                     }
                 });
             } else {
