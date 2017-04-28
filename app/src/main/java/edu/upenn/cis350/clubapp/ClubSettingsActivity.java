@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -310,8 +311,21 @@ public class ClubSettingsActivity extends AppCompatActivity {
     }
 
     private void populateChannelList(UserChannel[] clubChannels) {
-        ChannelAdapter ca = new ChannelAdapter(this, clubChannels);
+        final ChannelAdapter ca = new ChannelAdapter(this, clubChannels);
+
         channelList = (ListView) findViewById(R.id.channel_listview);
+        channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View item,
+                                    int position, long id) {
+                UserChannel uChannel = ca.getItem(position);
+                // invert state of user channel
+                uChannel.setActive(!uChannel.getActive());
+              //  PlanetViewHolder viewHolder = (PlanetViewHolder) item.getTag();
+               // viewHolder.getCheckBox().setChecked(planet.isChecked());
+            }
+        });
+
         channelList.setAdapter(ca);
 
     }
@@ -326,15 +340,60 @@ public class ClubSettingsActivity extends AppCompatActivity {
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            // TODO Auto-generated method stub
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            convertView = inflater.inflate(R.layout.checkbox_row, parent, false);
-            TextView label = (TextView) convertView.findViewById(R.id.textView);
-            CheckBox box = (CheckBox) convertView.findViewById(R.id.checkBox);
-            label.setText(channels[position].getName());
-            box.setChecked(channels[position].getActive());
+            UserChannel channel = this.getItem(position);
+
+            TextView label;
+            CheckBox box;
+            if(convertView == null) {
+                LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+                convertView = inflater.inflate(R.layout.checkbox_row, parent, false);
+                label = (TextView) convertView.findViewById(R.id.textView);
+                box = (CheckBox) convertView.findViewById(R.id.checkBox);
+                box.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        CheckBox cb = (CheckBox) v;
+                        UserChannel uChannel = (UserChannel) cb.getTag();
+                        uChannel.setActive(cb.isChecked());
+                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if(uChannel.getActive()) {
+                            mDatabaseReference.child("clubs").child(clubID).child("members")
+                                    .child(user.getUid()).child("channels").child(uChannel.getName()).setValue(true);
+                        } else {
+                            mDatabaseReference.child("clubs").child(clubID).child("members")
+                                    .child(user.getUid()).child("channels").child(uChannel.getName()).removeValue();
+                        }
+                        System.out.println("HI");
+                    }
+                });
+
+                label.setText(channels[position].getName());
+                box.setChecked(channels[position].getActive());
+                convertView.setTag(new ViewHolder(label, box));
+
+            } else {
+                ViewHolder viewH = (ViewHolder) convertView.getTag();
+                box = viewH.checkbox;
+                label = viewH.text;
+
+            }
+
+            box.setTag(channel);
+
             return convertView;
         }
+
+
+    }
+
+    private class ViewHolder {
+        protected TextView text;
+        protected CheckBox checkbox;
+
+        ViewHolder(TextView text, CheckBox box) {
+            this.text = text;
+            this.checkbox = box;
+        }
+
     }
 
   
