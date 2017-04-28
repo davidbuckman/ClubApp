@@ -79,7 +79,7 @@
             android:id="@+id/cal_add_button"
             android:layout_width="match_parent"
             android:layout_height="35dp"
-            android:text="HI"
+            android:text="ADD EVENT"
             android:layout_weight="0.10"
             android:layout_below="@id/bookings_listview"/>
 
