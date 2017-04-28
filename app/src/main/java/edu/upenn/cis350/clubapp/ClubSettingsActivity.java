@@ -286,11 +286,17 @@ public class ClubSettingsActivity extends AppCompatActivity {
                     usersChannels.add(snapshot.getKey().toString());
                 }
                 System.out.println("size of user channel set= " + usersChannels.size());
-
+                UserChannel generalChannel = null;
                 for(UserChannel u: clubChannels) {
                     if(usersChannels.contains(u.getName())) {
                         u.setActive(true);
                     }
+                    if (u.getName().equals("general")) {
+                        generalChannel = u;
+                    }
+                }
+                if (generalChannel != null) {
+                    clubChannels.remove(generalChannel);
                 }
 
                 //todo: pass to adapter
