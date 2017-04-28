@@ -4,31 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     tools:context="edu.upenn.cis350.clubapp.CalendarEventActivity">
 
     <android.support.v7.widget.Toolbar
-        android:titleTextColor="@color/white"
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
         android:fitsSystemWindows="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:titleTextColor="@color/white" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="341dp"
         android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/toolbar"
         android:padding="10dp"
         android:text="TextView"
+        android:textColor="#000000"
         android:textSize="36sp"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="33dp"
-        android:layout_below="@+id/toolbar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        tools:layout_editor_absoluteY="33dp" />
 
     <TextView
         android:id="@+id/date"
@@ -49,6 +51,9 @@
         android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_toEndOf="@+id/date"
+        android:layout_toRightOf="@+id/date"
         android:width="180dp"
         android:maxWidth="180dp"
         android:padding="10dp"
@@ -56,10 +61,7 @@
         android:text="TextView"
         android:textSize="18sp"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="114dp"
-        android:layout_below="@+id/title"
-        android:layout_toRightOf="@+id/date"
-        android:layout_toEndOf="@+id/date" />
+        tools:layout_editor_absoluteY="114dp" />
 
     <TextView
         android:id="@+id/description"
@@ -74,4 +76,23 @@
         android:textSize="18sp"
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="170dp" />
+
+    <Button
+        android:id="@+id/edit_event"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:text="Edit Event" />
+
+    <Button
+        android:id="@+id/delete_event"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Event"
+        android:layout_below="@+id/edit_event"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="21dp" />
 </RelativeLayout>

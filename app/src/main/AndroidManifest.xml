@@ -81,7 +81,9 @@
         <activity
             android:name=".InformationActivity"
             android:label="ClubDescription"
-            android:theme="@style/AppTheme.NoActionBar" />>
+            android:theme="@style/AppTheme.NoActionBar" />
+        >
+        <activity android:name=".AddEventActivity"></activity>
     </application>
 
 </manifest>

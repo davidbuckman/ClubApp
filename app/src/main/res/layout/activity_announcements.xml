@@ -9,9 +9,9 @@
     tools:openDrawer="start">
 
     <include
-        layout="@layout/app_bar_announcements_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    layout="@layout/app_bar_announcements_refresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
@@ -21,10 +21,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_announcements"
         app:menu="@menu/activity_announcements_drawer" />
-
-
-
-
 
 
 
