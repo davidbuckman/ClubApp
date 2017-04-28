@@ -31,6 +31,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
+        android:padding="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <EditText
@@ -100,6 +101,20 @@
             android:text="@string/delete_club"
             android:textStyle="bold"
             android:visibility="gone" />
+
+        <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        android:layout_marginTop="16dp"
+        android:background="#FF000000" />
+
+        <TextView
+            android:id="@+id/channelTitle"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Channel Select" />
 
         <ListView
             android:id="@+id/channel_listview"
