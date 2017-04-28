@@ -82,7 +82,9 @@ public class AnnouncementsActivity extends AppCompatActivity
         }
 
         startActivity(i);
-        finish();
+        // Calling finish after startActivity causes the announcement activity to break intent stack
+        // by finishing when its child intent finishes.
+     //   finish();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
