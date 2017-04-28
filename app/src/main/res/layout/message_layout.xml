@@ -58,6 +58,26 @@ android:orientation="vertical">
             android:paddingBottom="10dp"
             android:textColor="#000000" />
 
+        <LinearLayout
+            android:id="@+id/LinearLayoutDelete"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_alignParentBottom="true">
+            <Button
+                android:id="@+id/delete_announcement_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Delete Announcement"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
+                android:background="#FFFFFF"
+                android:paddingLeft="20dp"
+                android:textColor="#F79E21"
+                android:textStyle="normal|bold">
+            </Button>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 
