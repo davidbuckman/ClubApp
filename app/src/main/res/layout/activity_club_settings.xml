@@ -101,6 +101,12 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
+        <ListView
+            android:id="@+id/channel_listview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+
 
     </LinearLayout>
 
